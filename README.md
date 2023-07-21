@@ -10,9 +10,9 @@
 
 
 
-======================================
+
 SCRIPT SUPPORT VIA DISCORD: https://discord.gg/BJGFrThmA8
-======================================
+
 
 
 
