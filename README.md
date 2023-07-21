@@ -1,18 +1,4 @@
 
-##██╗░░░░░██╗░░░██╗░██████╗████████╗██╗░░░██╗░█████╗░░░██╗██╗
-##██║░░░░░██║░░░██║██╔════╝╚══██╔══╝╚██╗░██╔╝██╔══██╗░██╔╝██║
-##██║░░░░░██║░░░██║╚█████╗░░░░██║░░░░╚████╔╝░╚██████║██╔╝░██║
-##██║░░░░░██║░░░██║░╚═══██╗░░░██║░░░░░╚██╔╝░░░╚═══██║███████║
-##███████╗╚██████╔╝██████╔╝░░░██║░░░░░░██║░░░░█████╔╝╚════██║
-##╚══════╝░╚═════╝░╚═════╝░░░░╚═╝░░░░░░╚═╝░░░░╚════╝░░░░░░╚═╝
-	
-
-
-
-LUSTY94_LIMEYS
-
-
-=======================================
 -A LIMEYS JUICE BAR JOB FOR QB-CORE
 -CREATE 9 DIFFERENT SMOOTHIES
 -CREATE 3 HOT DRINKS
@@ -21,7 +7,7 @@ LUSTY94_LIMEYS
 -SUPPORT FOR QB-MENU, JIXEL-MENU, BOII_UI MENU, OX_LIB CONTEXT MENU
 -SUPPORT FOR QB-NOTIFY, OKOKNOTIFY, MYTHIC_NOTIFY, BOII_UI NOTIFY
 -SUPPORT FOR QB-TARGET AND OX_TARGET
-======================================
+
 
 
 ======================================
@@ -65,7 +51,7 @@ MAKE SURE TO INSTALL THE FIVEM VERSION NOT THE SINGLEPLAYER VERSION!
 
 
 
-MAKE SURE TO INSTALL ALL NECCESSARY DEPENDENCIES AND ENSURE THEY START BEFORE LUSTY94_BESTBUDS IN YOUR SERVER.CFG FILE
+MAKE SURE TO INSTALL ALL NECCESSARY DEPENDENCIES AND ENSURE THEY START BEFORE LUSTY94_LIMEYS IN YOUR SERVER.CFG FILE
 
 	
 Insert images inside [images] folder into inventory/html/images
