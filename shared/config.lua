@@ -22,7 +22,7 @@ Config.DebugPoly = false
 
 --Blip Settings
 Config.Blips = {
-    {title = 'Limeys Juice Bar', colour = 2, id = 77, coords = vector3(247.7, -1027.74, 29.14), scale = 0.7, useblip = true}, -- BLIP FOR VANILLA UNICORN
+    {title = 'Limeys Juice Bar', colour = 2, id = 77, coords = vector3(247.7, -1027.74, 29.14), scale = 0.7, useblip = true}, -- BLIP FOR LIMEYS JUICE BAR
 }
 
 
@@ -53,18 +53,23 @@ Config.CoreSettings = {
         },
     },    
     Menu = {
-        Type = 'qb', -- menu script name, support for qb-menu, jixel-menu, boii_ui menu and ox_lib context menu
+        Type = 'qb', -- menu script name, support for qb-menu, jixel-menu and ox_lib context menu
         --EDIT MENUS.LUA TO ADD YOUR OWN CUSTOM MENU SCRIPT 
         --use 'qb' for qb-menu
         --use 'jixel' for jixel-menu
-        --use 'boii' for boii_ui-menu
         --use 'ox' for ox_lib context menu
         --use 'custom' for your own custom menu
     },
+    Inventory = { 
+        Type = 'qb', -- support for qb-inventory and ox_inventory
+        --use 'qb' for qb-inventory
+        --use 'ox' for ox_inventory
+    },
     Shop = {
-        Type = 'qb', -- support for qb shops and jim shops
+        Type = 'qb', -- support for qb-inventory shops, jim-shops and ox_inventory shops
         --use 'qb' for qb-shops 
         --use 'jim' for jim-shop
+        --use 'ox' if using ox_inventory
     },
     ProgressBar = {
         Times = {

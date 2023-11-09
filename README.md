@@ -7,6 +7,7 @@
 -SUPPORT FOR QB-MENU, JIXEL-MENU, BOII_UI MENU, OX_LIB CONTEXT MENU
 -SUPPORT FOR QB-NOTIFY, OKOKNOTIFY, MYTHIC_NOTIFY, BOII_UI NOTIFY
 -SUPPORT FOR QB-TARGET AND OX_TARGET
+-SUPPORT FOR QB-INVENTORY AND OX_INVENTORY
 
 
 
@@ -15,6 +16,99 @@ SCRIPT SUPPORT VIA DISCORD: https://discord.gg/BJGFrThmA8
 
 
 
+## OX INVENTORY USERS - STORAGE FRIDGE, INGREDIENTS FRIDGE, SNACK SHELF & COLLECTION TRAY INFORMATION
+
+- If you are using ox_inventory you must add this snippet below to ox_inventory/data/shops & stashes.lua for the ingredients and snack shelf stores to work correctly. 
+
+``
+
+--SHOPS.LUA--
+
+    LimeysIngredients = {
+		name = 'Limeys Ingredients Store',
+		groups = {
+			['limeys'] = 0
+		},
+		inventory = {
+			{ name = 'icecubes', price = 0 },
+			{ name = 'fruitjuice', price = 0 },
+			{ name = 'mango', price = 0 },
+			{ name = 'peach', price = 0 },
+			{ name = 'lychee', price = 0 },
+			{ name = 'pineapple', price = 0 },
+			{ name = 'coconut', price = 0 },
+			{ name = 'strawberry', price = 0 },
+			{ name = 'passionfruit', price = 0 },
+			{ name = 'lemon', price = 0 },
+			{ name = 'almonds', price = 0 },
+		},
+		locations = {
+			vec3(252.99, -1023.53, 29.5)
+		}, 
+		targets = {
+			{ loc = vec3(252.99, -1023.53, 29.5), length = 0.4, width = 0.6, heading = 248.99, minZ = 29.45, maxZ = 29.7, distance = 3 }
+		}
+	},
+
+	LimeysSnacks = {
+		name = 'Limeys Snack Shelf',
+		inventory = {
+			{ name = 'chocolatedoughnut', price = 10 },
+			{ name = 'jamdoughnut', price = 10 },
+			{ name = 'custarddoughnut', price = 10 },
+			{ name = 'yumyum', price = 10 },
+			{ name = 'icedbun', price = 10 },
+		},
+		locations = {
+			vec3(254.24, -1016.8, 29.4)
+		}, 
+		targets = {
+			{ loc = vec3(254.24, -1016.8, 29.4), length = 0.8, width = 0.8, heading = 338.82, minZ = 28.75, maxZ = 30.5, distance = 3 }
+		}
+	},
+
+
+
+--STASHES.LUA--
+
+    { -- limeys juice bar storage fridge
+		coords = vec3(252.42, -1019.23, 29),
+		target = {
+			loc = vec3(252.42, -1019.23, 29),
+			length = 2.0,
+			width = 1.0,
+			heading = 71.47,
+			minZ = 28.5,
+			maxZ = 29.40,
+			label = 'Open Storage Fridge'
+		},
+		name = 'limeysstoragefridge',
+		label = 'Limeys Storage Fridge',
+		owner = true,
+		slots = 64,
+		weight = 10000000,
+		groups = {['limeys'] = 0}
+	},
+
+	{ -- limeys juice bar collection tray
+		coords = vec3(254.07, -1020.83, 29.5),
+		target = {
+			loc = vec3(254.07, -1020.83, 29.5),
+			length = 0.8,
+			width = 0.8,
+			heading = 249.99,
+			minZ = 29.45,
+			maxZ = 29.55,
+			label = 'Open Collection Tray'
+		},
+		name = 'limeyscollectiontray',
+		label = 'Limeys Collection Tray',
+		owner = false,
+		slots = 5,
+		weight = 1000000,
+	},
+
+``
 
 
 
@@ -54,7 +148,7 @@ MAKE SURE TO INSTALL THE FIVEM VERSION NOT THE SINGLEPLAYER VERSION!
 MAKE SURE TO INSTALL ALL NECCESSARY DEPENDENCIES AND ENSURE THEY START BEFORE LUSTY94_LIMEYS IN YOUR SERVER.CFG FILE
 
 	
-Insert images inside [images] folder into inventory/html/images
+Insert images inside [images] folder into inventory/html/images - ox_inventory is web/images
 
 
 Insert items into qb-core/shared/items.lua

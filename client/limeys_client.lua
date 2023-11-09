@@ -1,11 +1,19 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-
+local ShopType = Config.CoreSettings.Shop.Type
+local InvType = Config.CoreSettings.Inventory.Type
+local TargetType = Config.CoreSettings.Target.Type
 
 
 ---------------------------------< CLEAR PEDS START >---------------------------
 
 --THIS CLEARS THE MLO OF PEDS FROM THE CENTRE OF THE MLO AT A RADIUS OF 20.0 AS SOMETIMES PED SPAWN INSIDE THE BUILDING AND KEEP TRYING TO GO THROUGH WALLS
-ClearAreaOfPeds(257.95, -1022.84, 29.31, 20.0, true)
+
+CreateThread(function()
+    while true do
+        ClearAreaOfPeds(257.95, -1022.84, 29.31, 20.0, true)
+        Wait(100)
+    end
+end)
 
 ---------------------------------< CLEAR PEDS END >---------------------------
 
@@ -845,20 +853,32 @@ end)
 
 -----------------------------------------------------< STASHES SECTION START >---------------------------------------------------
 RegisterNetEvent("lusty94_limeys:client:OpenCollectionTray", function()
-    TriggerEvent("inventory:client:SetCurrentStash", "collectiontray")
-    TriggerServerEvent("inventory:server:OpenInventory", "stash", "collectiontray", {
-        maxweight = Config.InteractionLocations.CollectionTray.StashSize,
-        slots = Config.InteractionLocations.CollectionTray.StashSlots,
-    })
+    if InvType == 'qb' then
+        TriggerEvent("inventory:client:SetCurrentStash", "collectiontray")
+        TriggerServerEvent("inventory:server:OpenInventory", "stash", "collectiontray", {
+            maxweight = Config.InteractionLocations.CollectionTray.StashSize,
+            slots = Config.InteractionLocations.CollectionTray.StashSlots,
+        })
+    elseif InvType == 'ox' then
+        print('InvType is set to "ox" make sure you have added the required snippet from the readme file to ox_inventory/data/stashes.lua as the target option for collection tray is now disabled and the event controlled by ox_inventory')
+    end
 end)
+
+
+
+
 
 RegisterNetEvent("lusty94_limeys:client:OpenStorageFridge", function()
     if onDuty then
-        TriggerEvent("inventory:client:SetCurrentStash", "limeysdrinksfridge")
-        TriggerServerEvent("inventory:server:OpenInventory", "stash", "limeysdrinksfridge", {
-            maxweight = Config.InteractionLocations.Storage.Fridge.StashSize,
-            slots = Config.InteractionLocations.Storage.Fridge.StashSlots,
-        })
+        if InvType == 'qb' then
+            TriggerEvent("inventory:client:SetCurrentStash", "limeysdrinksfridge")
+            TriggerServerEvent("inventory:server:OpenInventory", "stash", "limeysdrinksfridge", {
+                maxweight = Config.InteractionLocations.Storage.Fridge.StashSize,
+                slots = Config.InteractionLocations.Storage.Fridge.StashSlots,
+            })
+        elseif InvType == 'ox' then
+            print('InvType is set to "ox" make sure you have added the required snippet from the readme file to ox_inventory/data/stashes.lua as the target option for drinks fridge stash is now disabled and the event controlled by ox_inventory')
+        end
     else
         if Config.CoreSettings.Notify.Type == 'qb' then
             QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
@@ -874,10 +894,12 @@ end)
 
 AddEventHandler("lusty94_limeys:client:IngredientsTray", function()
     if onDuty then
-        if Config.CoreSettings.Shop.Type == 'qb'then
+        if ShopType == 'qb'then
             TriggerServerEvent("inventory:server:OpenInventory", "shop", "IngredientsTray", Config.InteractionLocations.Ingredients.Items)
-        elseif Config.CoreSettings.Shop.Type == 'jim' then
+        elseif ShopType == 'jim' then
             TriggerServerEvent("jim-shops:ShopOpen", "shop", "IngredientsTray", Config.InteractionLocations.Ingredients.Items)
+        elseif ShopType == 'ox' then
+            print('ShopType is set to "ox" make sure you have added the required snippet from the readme file to ox_inventory/data/shops.lua as the target option for ingredients tray is now disabled and the event controlled by ox_inventory')
         end
     else
         if Config.CoreSettings.Notify.Type == 'qb' then
@@ -893,10 +915,12 @@ AddEventHandler("lusty94_limeys:client:IngredientsTray", function()
 end)
 
 AddEventHandler("lusty94_limeys:client:SnackShelf", function()
-    if Config.CoreSettings.Shop.Type == 'qb' then
+    if ShopType == 'qb' then
         TriggerServerEvent("inventory:server:OpenInventory", "shop", "SnackShelf", Config.InteractionLocations.SnackShelf.Items)
-    elseif Config.CoreSettings.Shop.Type == 'jim' then
+    elseif ShopType == 'jim' then
         TriggerServerEvent("jim-shops:ShopOpen", "shop", "SnackShelf", Config.InteractionLocations.SnackShelf.Items)
+    elseif ShopType == 'ox' then
+        print('ShopType is set to "ox" make sure you have added the required snippet from the readme file to ox_inventory/data/shops.lua as the target option for the snack shelf is now disabled and the event controlled by ox_inventory')
     end
 end)
 -----------------------------------------------------< STASHES SECTION END >---------------------------------------------------
@@ -956,14 +980,26 @@ end)
 AddEventHandler('onResourceStop', function(resourceName) if resourceName ~= GetCurrentResourceName() then return end
 if (GetCurrentResourceName() ~= resourceName) then
 end
-    print('^5--<^3!^5>-- ^7Lusty94 ^5| ^5--<^3!^5>-- ^Limeys V1.0.0 Stopped Successfully ^5--<^3!^5>--^7')
-    exports['qb-target']:RemoveZone("DutyZone")
-    exports['qb-target']:RemoveZone("BossMenuZone")
-    exports['qb-target']:RemoveZone("PaymentZone")
-    exports['qb-target']:RemoveZone("CollectionTrayZone")
-    exports['qb-target']:RemoveZone("SmoothieMachineZone")
-    exports['qb-target']:RemoveZone("HotDrinksMachineZone")
-    exports['qb-target']:RemoveZone("StorageFridgeZone")
-    exports['qb-target']:RemoveZone("IngredientsTrayZone")
-    exports['qb-target']:RemoveZone("SnackShelfZone")
+    print('^5--<^3!^5>-- ^7Lusty94 ^5| ^5--<^3!^5>-- ^Limeys V1.1.0 Stopped Successfully ^5--<^3!^5>--^7')
+    if TargetType == 'qb' then
+        exports['qb-target']:RemoveZone("DutyZone")
+        exports['qb-target']:RemoveZone("BossMenuZone")
+        exports['qb-target']:RemoveZone("PaymentZone")
+        exports['qb-target']:RemoveZone("CollectionTrayZone")
+        exports['qb-target']:RemoveZone("SmoothieMachineZone")
+        exports['qb-target']:RemoveZone("HotDrinksMachineZone")
+        exports['qb-target']:RemoveZone("StorageFridgeZone")
+        exports['qb-target']:RemoveZone("IngredientsTrayZone")
+        exports['qb-target']:RemoveZone("SnackShelfZone")
+    elseif TargetType == 'ox' then
+        exports.ox_target:removeZone(1)
+        exports.ox_target:removeZone(2)
+        exports.ox_target:removeZone(3)
+        exports.ox_target:removeZone(4)
+        exports.ox_target:removeZone(5)
+        exports.ox_target:removeZone(6)
+        exports.ox_target:removeZone(7)
+        exports.ox_target:removeZone(8)
+        exports.ox_target:removeZone(9)
+    end
 end)

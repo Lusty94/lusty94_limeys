@@ -1,21 +1,29 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-
+local InvType = Config.CoreSettings.Inventory.Type
 
 
 --Give Smoothie Cup
 RegisterNetEvent('lusty94_limeys:server:GiveSmoothieCup', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)
+    if InvType == 'qb' then        
         Player.Functions.AddItem("smoothiecup", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:AddItem(src,"smoothiecup", 1)
+    end
 end)
 
 --Give Coffee Cup
 RegisterNetEvent('lusty94_limeys:server:GiveCoffeeCup', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)
+    if InvType == 'qb' then        
         Player.Functions.AddItem("coffeecup", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["coffeecup"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:AddItem(src,"coffeecup", 1)
+    end
 end)
 
 --Coffee Cup Callback For Hot Drinks
@@ -33,31 +41,46 @@ end)
 --Create Tea
 RegisterNetEvent('lusty94_limeys:server:CreateTea', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)
+    if InvType == 'qb' then        
         Player.Functions.RemoveItem("coffeecup", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["coffeecup"], "remove")
         Player.Functions.AddItem("tea", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["tea"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"coffeecup", 1)
+        exports.ox_inventory:AddItem(src,"tea", 1)
+    end
 end)
 
 --Create Coffee
 RegisterNetEvent('lusty94_limeys:server:CreateCoffee', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)     
+    if InvType == 'qb' then   
         Player.Functions.RemoveItem("coffeecup", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["coffeecup"], "remove")
         Player.Functions.AddItem("coffee", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["coffee"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"coffeecup", 1)
+        exports.ox_inventory:AddItem(src,"coffee", 1)
+    end
 end)
 
 --Create Hot Chocolate
 RegisterNetEvent('lusty94_limeys:server:CreateHotChocolate', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)  
+    if InvType == 'qb' then      
         Player.Functions.RemoveItem("coffeecup", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["coffeecup"], "remove")
         Player.Functions.AddItem("hotchocolate", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["hotchocolate"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"coffeecup", 1)
+        exports.ox_inventory:AddItem(src,"hotchocolate", 1)
+    end
 end)
 
 
@@ -79,7 +102,8 @@ end)
 --Create Mango Smoothie
 RegisterNetEvent('lusty94_limeys:server:CreateMangoSmoothie', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)
+    if InvType == 'qb' then        
         Player.Functions.RemoveItem("mango", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["mango"], "remove")
         Player.Functions.RemoveItem("fruitjuice", 1)
@@ -90,6 +114,13 @@ RegisterNetEvent('lusty94_limeys:server:CreateMangoSmoothie', function()
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "remove")
         Player.Functions.AddItem("mangosmoothie", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["mangosmoothie"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"mango", 1)
+        exports.ox_inventory:RemoveItem(src,"fruitjuice", 1)
+        exports.ox_inventory:RemoveItem(src,"icecubes", 1)
+        exports.ox_inventory:RemoveItem(src,"smoothiecup", 1)
+        exports.ox_inventory:AddItem(src,"mangosmoothie", 1)
+    end
 end)
 
 -- Peach Smoothie Callback
@@ -110,7 +141,8 @@ end)
 --Create Peach Smoothie
 RegisterNetEvent('lusty94_limeys:server:CreatePeachSmoothie', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)  
+    if InvType == 'qb' then      
         Player.Functions.RemoveItem("peach", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["peach"], "remove")
         Player.Functions.RemoveItem("fruitjuice", 1)
@@ -121,6 +153,13 @@ RegisterNetEvent('lusty94_limeys:server:CreatePeachSmoothie', function()
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "remove")
         Player.Functions.AddItem("peachsmoothie", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["peachsmoothie"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"peach", 1)
+        exports.ox_inventory:RemoveItem(src,"fruitjuice", 1)
+        exports.ox_inventory:RemoveItem(src,"icecubes", 1)
+        exports.ox_inventory:RemoveItem(src,"smoothiecup", 1)
+        exports.ox_inventory:AddItem(src,"peachsmoothie", 1)
+    end
 end)
 
 -- Lychee Smoothie Callback
@@ -141,7 +180,8 @@ end)
 --Create Lychee Smoothie
 RegisterNetEvent('lusty94_limeys:server:CreateLycheeSmoothie', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src) 
+    if InvType == 'qb' then       
         Player.Functions.RemoveItem("lychee", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["lychee"], "remove")
         Player.Functions.RemoveItem("fruitjuice", 1)
@@ -152,6 +192,13 @@ RegisterNetEvent('lusty94_limeys:server:CreateLycheeSmoothie', function()
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "remove")
         Player.Functions.AddItem("lycheesmoothie", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["lycheesmoothie"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"lychee", 1)
+        exports.ox_inventory:RemoveItem(src,"fruitjuice", 1)
+        exports.ox_inventory:RemoveItem(src,"icecubes", 1)
+        exports.ox_inventory:RemoveItem(src,"smoothiecup", 1)
+        exports.ox_inventory:AddItem(src,"lycheesmoothie", 1)
+    end
 end)
 
 -- Pineapple Smoothie Callback
@@ -172,7 +219,8 @@ end)
 --Create Pineapple Smoothie
 RegisterNetEvent('lusty94_limeys:server:CreatePineappleSmoothie', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src) 
+    if InvType == 'qb' then       
         Player.Functions.RemoveItem("pineapple", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["pineapple"], "remove")
         Player.Functions.RemoveItem("fruitjuice", 1)
@@ -183,6 +231,13 @@ RegisterNetEvent('lusty94_limeys:server:CreatePineappleSmoothie', function()
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "remove")
         Player.Functions.AddItem("pineapplesmoothie", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["pineapplesmoothie"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"pineapple", 1)
+        exports.ox_inventory:RemoveItem(src,"fruitjuice", 1)
+        exports.ox_inventory:RemoveItem(src,"icecubes", 1)
+        exports.ox_inventory:RemoveItem(src,"smoothiecup", 1)
+        exports.ox_inventory:AddItem(src,"pineapplesmoothie", 1)
+    end
 end)
 
 -- Coconut Smoothie Callback
@@ -203,7 +258,8 @@ end)
 --Create Coconut Smoothie
 RegisterNetEvent('lusty94_limeys:server:CreateCoconutSmoothie', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)
+    if InvType == 'qb' then        
         Player.Functions.RemoveItem("coconut", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["coconut"], "remove")
         Player.Functions.RemoveItem("fruitjuice", 1)
@@ -214,6 +270,13 @@ RegisterNetEvent('lusty94_limeys:server:CreateCoconutSmoothie', function()
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "remove")
         Player.Functions.AddItem("coconutsmoothie", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["coconutsmoothie"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"coconut", 1)
+        exports.ox_inventory:RemoveItem(src,"fruitjuice", 1)
+        exports.ox_inventory:RemoveItem(src,"icecubes", 1)
+        exports.ox_inventory:RemoveItem(src,"smoothiecup", 1)
+        exports.ox_inventory:AddItem(src,"coconutsmoothie", 1)
+    end
 end)
 
 -- Strawberry Smoothie Callback
@@ -235,6 +298,7 @@ end)
 RegisterNetEvent('lusty94_limeys:server:CreateStrawberrySmoothie', function()
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)        
+    if InvType == 'qb' then
         Player.Functions.RemoveItem("strawberry", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["strawberry"], "remove")
         Player.Functions.RemoveItem("fruitjuice", 1)
@@ -245,6 +309,13 @@ RegisterNetEvent('lusty94_limeys:server:CreateStrawberrySmoothie', function()
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "remove")
         Player.Functions.AddItem("strawberrysmoothie", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["strawberrysmoothie"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"strawberry", 1)
+        exports.ox_inventory:RemoveItem(src,"fruitjuice", 1)
+        exports.ox_inventory:RemoveItem(src,"icecubes", 1)
+        exports.ox_inventory:RemoveItem(src,"smoothiecup", 1)
+        exports.ox_inventory:AddItem(src,"strawberrysmoothie", 1)
+    end
 end)
 
 -- PassionFruit Smoothie Callback
@@ -265,7 +336,8 @@ end)
 --Create PassionFruit Smoothie
 RegisterNetEvent('lusty94_limeys:server:CreatePassionFruitSmoothie', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)
+    if InvType == 'qb' then        
         Player.Functions.RemoveItem("passionfruit", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["passionfruit"], "remove")
         Player.Functions.RemoveItem("fruitjuice", 1)
@@ -276,6 +348,13 @@ RegisterNetEvent('lusty94_limeys:server:CreatePassionFruitSmoothie', function()
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "remove")
         Player.Functions.AddItem("passionfruitsmoothie", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["passionfruitsmoothie"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"passionfruit", 1)
+        exports.ox_inventory:RemoveItem(src,"fruitjuice", 1)
+        exports.ox_inventory:RemoveItem(src,"icecubes", 1)
+        exports.ox_inventory:RemoveItem(src,"smoothiecup", 1)
+        exports.ox_inventory:AddItem(src,"passionfruitsmoothie", 1)
+    end
 end)
 
 -- Lemon Smoothie Callback
@@ -296,7 +375,8 @@ end)
 --Create Lemon Smoothie
 RegisterNetEvent('lusty94_limeys:server:CreateLemonSmoothie', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)
+    if InvType == 'qb' then        
         Player.Functions.RemoveItem("lemon", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["lemon"], "remove")
         Player.Functions.RemoveItem("fruitjuice", 1)
@@ -307,6 +387,13 @@ RegisterNetEvent('lusty94_limeys:server:CreateLemonSmoothie', function()
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "remove")
         Player.Functions.AddItem("lemonsmoothie", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["lemonsmoothie"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"lemon", 1)
+        exports.ox_inventory:RemoveItem(src,"fruitjuice", 1)
+        exports.ox_inventory:RemoveItem(src,"icecubes", 1)
+        exports.ox_inventory:RemoveItem(src,"smoothiecup", 1)
+        exports.ox_inventory:AddItem(src,"lemonsmoothie", 1)
+    end
 end)
 
 -- Almond Smoothie Callback
@@ -327,7 +414,8 @@ end)
 --Create Almond Smoothie
 RegisterNetEvent('lusty94_limeys:server:CreateAlmondSmoothie', function()
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)        
+    local Player = QBCore.Functions.GetPlayer(src)  
+    if InvType == 'qb' then      
         Player.Functions.RemoveItem("almonds", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["almonds"], "remove")
         Player.Functions.RemoveItem("fruitjuice", 1)
@@ -338,6 +426,13 @@ RegisterNetEvent('lusty94_limeys:server:CreateAlmondSmoothie', function()
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["smoothiecup"], "remove")
         Player.Functions.AddItem("almondsmoothie", 1)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["almondsmoothie"], "add")
+    elseif InvType == 'ox' then
+        exports.ox_inventory:RemoveItem(src,"almonds", 1)
+        exports.ox_inventory:RemoveItem(src,"fruitjuice", 1)
+        exports.ox_inventory:RemoveItem(src,"icecubes", 1)
+        exports.ox_inventory:RemoveItem(src,"smoothiecup", 1)
+        exports.ox_inventory:AddItem(src,"almondsmoothie", 1)
+    end
 end)
 
 
@@ -345,7 +440,7 @@ AddEventHandler('onResourceStart', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then
       return
     end
-    print('^5--<^3!^5>-- ^7Lusty94 ^5| ^5--<^3!^5>-- ^Limeys V1.0.0 Started Successfully ^5--<^3!^5>--^7')
+    print('^5--<^3!^5>-- ^7Lusty94 ^5| ^5--<^3!^5>-- ^Limeys V1.1.0 Started Successfully ^5--<^3!^5>--^7')
 end)
 
 
