@@ -11,8 +11,7 @@ local SmoothieMenu = {
     {   
         header = "Get A Smoothie Cup",
         params = {
-            isServer = true,
-            event = "lusty94_limeys:server:GiveSmoothieCup",
+            event = "lusty94_limeys:client:GiveSmoothieCup",
         }
     },          
     {   
@@ -95,9 +94,7 @@ lib.registerContext({
       {
         title = 'Get Smoothie Cup',
         icon = 'glass-water',
-        onSelect = function()
-            TriggerServerEvent('lusty94_limeys:server:GiveSmoothieCup')
-        end,
+        event = 'lusty94_limeys:client:GiveSmoothieCup',
         arrow = true,
       },
       {
@@ -238,8 +235,7 @@ local HotDrinksMenu = {
     {   
         header = "Get A Coffee Cup",
         params = {
-            isServer = true,
-            event = "lusty94_limeys:server:GiveCoffeeCup",
+            event = "lusty94_limeys:client:GiveCoffeeCup",
         }
     },          
     {   
@@ -279,9 +275,7 @@ lib.registerContext({
       {
         title = 'Get A Coffee Cup',
         icon = 'mug-saucer',
-        onSelect = function()
-            TriggerServerEvent('lusty94_limeys:server:GiveCoffeeCup')
-        end,
+        event = 'lusty94_limeys:client:GiveCoffeeCup',
         arrow = true,
       },
       {

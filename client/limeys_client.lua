@@ -2,25 +2,34 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local ShopType = Config.CoreSettings.Shop.Type
 local InvType = Config.CoreSettings.Inventory.Type
 local TargetType = Config.CoreSettings.Target.Type
+local NotifyType = Config.CoreSettings.Notify.Type
+local onDuty, busy = false, false
+PlayerJob = {}
 
 
----------------------------------< CLEAR PEDS START >---------------------------
-
---THIS CLEARS THE MLO OF PEDS FROM THE CENTRE OF THE MLO AT A RADIUS OF 20.0 AS SOMETIMES PED SPAWN INSIDE THE BUILDING AND KEEP TRYING TO GO THROUGH WALLS
-
-CreateThread(function()
-    while true do
-        ClearAreaOfPeds(257.95, -1022.84, 29.31, 20.0, true)
-        Wait(100)
+--notification function
+local function SendNotify(msg,type,time,title)
+    if NotifyType == nil then print("Lusty94_Limeys: NotifyType Not Set in Config.CoreSettings.Notify.Type!") return end
+    if not title then title = "Notification" end
+    if not time then time = 5000 end
+    if not type then type = 'success' end
+    if not msg then print("Notification Sent With No Message.") return end
+    if NotifyType == 'qb' then
+        QBCore.Functions.Notify(msg,type,time)
+    elseif NotifyType == 'okok' then
+        exports['okokNotify']:Alert(title, msg, time, type, true)
+    elseif NotifyType == 'mythic' then
+        exports['mythic_notify']:DoHudText(type, msg)
+    elseif NotifyType == 'boii' then
+        exports['boii_ui']:notify(title, msg, type, time)
+    elseif NotifyType == 'ox' then
+        lib.notify({ title = title, description = msg, type = type, duration = time})
+    elseif NotifyType == 'custom' then
+        --insert your own notify function here
     end
-end)
-
----------------------------------< CLEAR PEDS END >---------------------------
+end
 
 
-
-
--------------------------------------------< BLIP SECTION START >--------------------------------
 --Blips
 CreateThread(function()
     for k, v in pairs(Config.Blips) do
@@ -37,104 +46,52 @@ CreateThread(function()
         end
     end
 end)
--------------------------------------------------< BLIP SECTION END >--------------------------------
-
-
-
----------------------------------------------------< JOB SECTION START >----------------------------------------
-local onDuty = false
-PlayerJob = {}
-
-
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
-   QBCore.Functions.GetPlayerData(function(PlayerData)
-       PlayerJob = PlayerData.job
-   end)
-end)
-
-RegisterNetEvent('QBCore:Client:OnJobUpdate')
-AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo)
-   PlayerJob = JobInfo
-   onDuty = PlayerJob.onduty
-end)
-
-RegisterNetEvent('QBCore:Client:SetDuty')
-AddEventHandler('QBCore:Client:SetDuty', function(duty)
-   onDuty = duty
-end)
-
-RegisterNetEvent("lusty94_limeys:client:ToggleDuty")
-AddEventHandler("lusty94_limeys:client:ToggleDuty", function()
-   TriggerServerEvent("QBCore:ToggleDuty")
-end)
----------------------------------------------------< JOB SECTION END >----------------------------------------
 
 
 
 
--------------------------------------------------< MAKING SMOOTHIES START >---------------------------------
+
+
+
+
 --Prepare Mango Smoothie
 RegisterNetEvent("lusty94_limeys:client:PrepareMangoSmoothie", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:MangoSmoothie', function(HasItems)  
-            if HasItems then
-                QBCore.Functions.Progressbar("mango_smoothie", "Preparing Mango Smoothie", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreateMangoSmoothie')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Mango Smoothie!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Mango Smoothie!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Mango Smoothie!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Mango Smoothie!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
-                end)
+        if HasItems then
+                if busy then
+                    SendNotify("You Are Already Doing Something!", 'error', 2500)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    busy = true
+                    LockInventory(true)
+                    QBCore.Functions.Progressbar("mango_smoothie", "Preparing Mango Smoothie", 10000, false, true, {
+                        disableMovement = true,
+                        disableCarMovement = true,
+                        disableMouse = false,
+                        disableCombat = true,
+                    }, {
+                        animDict = "amb@prop_human_parking_meter@female@base",
+                        anim = "base_female",
+                        flags = 41,
+                    }, {}, {}, function()
+                        busy = false
+                        LockInventory(false)
+                        ClearPedTasks(PlayerPedId())
+                        TriggerServerEvent('lusty94_limeys:server:CreateMangoSmoothie')
+                        SendNotify("Mango Smoothie Prepared!", 'success', 2500)
+                    end, function()
+                        busy = false
+                        LockInventory(false)
+                        ClearPedTasks(PlayerPedId())
+                        SendNotify("Action cancelled!", 'error', 2500)
+                    end)
                 end
-            end)
+            else
+                SendNotify("You Are Missing Items!", 'error', 2500)
+            end
+        end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end) 
 
@@ -143,62 +100,39 @@ RegisterNetEvent("lusty94_limeys:client:PreparePeachSmoothie", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:PeachSmoothie', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("peach_smoothie", "Preparing Peach Smoothie", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreatePeachSmoothie')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Peach Smoothie!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Peach Smoothie!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Peach Smoothie!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Peach Smoothie!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("peach_smoothie", "Preparing Peach Smoothie", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreatePeachSmoothie')
+                            SendNotify("Peach Smoothie Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end) 
 
@@ -207,62 +141,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareLycheeSmoothie", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:LycheeSmoothie', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("lychee_smoothie", "Preparing Lychee Smoothie", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreateLycheeSmoothie')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Lychee Smoothie!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Lychee Smoothie!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Lychee Smoothie!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Lychee Smoothie!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("lychee_smoothie", "Preparing Lychee Smoothie", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreateLycheeSmoothie')
+                            SendNotify("Lychee Smoothie Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end) 
 
@@ -271,62 +182,39 @@ RegisterNetEvent("lusty94_limeys:client:PreparePineappleSmoothie", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:PineappleSmoothie', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("pineapple_smoothie", "Preparing Pineapple Smoothie", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreatePineappleSmoothie')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Pineapple Smoothie!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Pineapple Smoothie!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Pineapple Smoothie!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Pineapple Smoothie!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("pineapple_smoothie", "Preparing Pineapple Smoothie", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreatePineappleSmoothie')
+                            SendNotify("Pineapple Smoothie Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end)
 
@@ -335,62 +223,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareCoconutSmoothie", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:CoconutSmoothie', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("coconut_smoothie", "Preparing Coconut Smoothie", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreateCoconutSmoothie')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Coconut Smoothie!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Coconut Smoothie!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Coconut Smoothie!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Coconut Smoothie!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("coconut_smoothie", "Preparing Coconut Smoothie", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreateCoconutSmoothie')
+                            SendNotify("Coconut Smoothie Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end) 
 
@@ -399,62 +264,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareStrawberrySmoothie", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:StrawberrySmoothie', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("strawberry_smoothie", "Preparing Strawberry Smoothie", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreateStrawberrySmoothie')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Strawberry Smoothie!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Strawberry Smoothie!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Strawberry Smoothie!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Strawberry Smoothie!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("strawberry_smoothie", "Preparing Strawberry Smoothie", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreateStrawberrySmoothie')
+                            SendNotify("Strawberry Smoothie Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end)
 
@@ -463,62 +305,39 @@ RegisterNetEvent("lusty94_limeys:client:PreparePassionFruitSmoothie", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:PassionFruitSmoothie', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("passionFruit_smoothie", "Preparing Passion Fruit Smoothie", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreatePassionFruitSmoothie')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Passion Fruit Smoothie!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Passion Fruit Smoothie!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Passion Fruit Smoothie!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Passion Fruit Smoothie!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("passionFruit_smoothie", "Preparing Passion Fruit Smoothie", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreatePassionFruitSmoothie')
+                            SendNotify("Passion Fruit Smoothie Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end) 
 
@@ -527,62 +346,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareLemonSmoothie", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:LemonSmoothie', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("lemon_smoothie", "Preparing Lemon Smoothie", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreateLemonSmoothie')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Lemon Smoothie!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Lemon Smoothie!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Lemon Smoothie!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Lemon Smoothie!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("lemon_smoothie", "Preparing Lemon Smoothie", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreateLemonSmoothie')
+                            SendNotify("Lemon Smoothie Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end)  
 
@@ -591,131 +387,81 @@ RegisterNetEvent("lusty94_limeys:client:PrepareAlmondSmoothie", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:AlmondSmoothie', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("almond_smoothie", "Preparing Almond Smoothie", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreateAlmondSmoothie')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Almond Smoothie!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Almond Smoothie!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Almond Smoothie!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Almond Smoothie!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("almond_smoothie", "Preparing Almond Smoothie", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreateAlmondSmoothie')
+                            SendNotify("Almond Smoothie Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end) 
--------------------------------------------------< MAKING SMOOTHIES END >-----------------------------------
 
 
-
-
--------------------------------------------------< MAKING HOT DRINKS START >-----------------------------------
 --Prepare Tea
 RegisterNetEvent("lusty94_limeys:client:PrepareTea", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:CoffeeCup', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("prepare_tea", "Preparing Cup of Tea", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreateTea')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Cup of Tea!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Cup of Tea!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Cup of Tea!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Cup of Tea!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("prepare_tea", "Preparing Cup of Tea", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreateTea')
+                            SendNotify("Cup of Tea Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end) 
 
@@ -724,62 +470,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareCoffee", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:CoffeeCup', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("prepare_coffee", "Preparing Cup of Coffee", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreateCoffee')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Cup of Coffee!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Cup of Coffee!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Cup of Coffee!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Cup of Coffee!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("prepare_coffee", "Preparing Cup of Coffee", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreateCoffee')
+                            SendNotify("Cup of Coffee Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end) 
 
@@ -788,70 +511,47 @@ RegisterNetEvent("lusty94_limeys:client:PrepareHotChocolate", function()
     if onDuty then
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:CoffeeCup', function(HasItems)  
             if HasItems then
-                QBCore.Functions.Progressbar("prepare_hotchocolate", "Preparing Cup of Hot Chocolate", Config.CoreSettings.ProgressBar.Times.PrepareSmoothies, false, false, {
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = "amb@prop_human_parking_meter@female@base",
-                    anim = "base_female",
-                    flags = 41,
-                }, {}, {}, function()
-                    ClearPedTasks(PlayerPedId())
-                    TriggerServerEvent('lusty94_limeys:server:CreateHotChocolate')
-                        if Config.CoreSettings.Notify.Type == 'qb' then
-                            QBCore.Functions.Notify("You Prepared A Cup of Hot Chocolate!", "success", Config.CoreSettings.Notify.Length.Success)
-                        elseif Config.CoreSettings.Notify.Type == 'okok' then
-                            exports['okokNotify']:Alert('Prepared Smoothie', 'You Prepared A Cup of Hot Chocolate!', Config.CoreSettings.Notify.Length.Success, 'success', Config.CoreSettings.Notify.Sound)
-                        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                            exports['mythic_notify']:DoHudText('success', 'You Prepared A Cup of Hot Chocolate!')
-                        elseif Config.CoreSettings.Notify.Type == 'boii' then
-                            exports['boii_ui']:notify('Prepared Smoothie', 'You Prepared A Cup of Hot Chocolate!', 'success', Config.CoreSettings.Notify.Length.Success)
-                        end
-                end, function()
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("Cancelled", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Cancelled','Cancelled', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'Cancelled') 
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Cancelled', 'Cancelled', 'error', Config.CoreSettings.Notify.Length.Error)
+                    if busy then
+                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    else
+                        busy = true
+                        LockInventory(true)
+                        QBCore.Functions.Progressbar("prepare_hotchocolate", "Preparing Cup of Hot Chocolate", 10000, false, true, {
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = "amb@prop_human_parking_meter@female@base",
+                            anim = "base_female",
+                            flags = 41,
+                        }, {}, {}, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            TriggerServerEvent('lusty94_limeys:server:CreateHotChocolate')
+                            SendNotify("Hot Chocolate Prepared!", 'success', 2500)
+                        end, function()
+                            busy = false
+                            LockInventory(false)
+                            ClearPedTasks(PlayerPedId())
+                            SendNotify("Action cancelled!", 'error', 2500)
+                        end)
                     end
-                end)
                 else
-                    ClearPedTasks(PlayerPedId())
-                    if Config.CoreSettings.Notify.Type == 'qb' then
-                        QBCore.Functions.Notify("You Are Missing Items", "error", Config.CoreSettings.Notify.Length.Error)
-                    elseif Config.CoreSettings.Notify.Type == 'okok' then
-                        exports['okokNotify']:Alert('Missing Items','You Are Missing Items', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-                    elseif Config.CoreSettings.Notify.Type == 'mythic' then
-                        exports['mythic_notify']:DoHudText('error', 'You Are Missing Items')
-                    elseif Config.CoreSettings.Notify.Type == 'boii' then
-                        exports['boii_ui']:notify('Missing Items', 'You Are Missing Items', 'error', Config.CoreSettings.Notify.Length.Error)
-                    end
+                    SendNotify("You Are Missing Items!", 'error', 2500)
                 end
             end)
     else 
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic' then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end) 
--------------------------------------------------< MAKING HOT DRINKS END >-----------------------------------
 
 
 
 
------------------------------------------------------< STASHES SECTION START >---------------------------------------------------
+
+--collection tray
 RegisterNetEvent("lusty94_limeys:client:OpenCollectionTray", function()
     if InvType == 'qb' then
         TriggerEvent("inventory:client:SetCurrentStash", "collectiontray")
@@ -860,14 +560,14 @@ RegisterNetEvent("lusty94_limeys:client:OpenCollectionTray", function()
             slots = Config.InteractionLocations.CollectionTray.StashSlots,
         })
     elseif InvType == 'ox' then
-        print('InvType is set to "ox" make sure you have added the required snippet from the readme file to ox_inventory/data/stashes.lua as the target option for collection tray is now disabled and the event controlled by ox_inventory')
+        exports.ox_inventory:openInventory('stash', 'limeyscollectiontray') -- if changing stash name in ox make sure you change it here too
     end
 end)
 
 
 
 
-
+--storage fridge
 RegisterNetEvent("lusty94_limeys:client:OpenStorageFridge", function()
     if onDuty then
         if InvType == 'qb' then
@@ -877,61 +577,80 @@ RegisterNetEvent("lusty94_limeys:client:OpenStorageFridge", function()
                 slots = Config.InteractionLocations.Storage.Fridge.StashSlots,
             })
         elseif InvType == 'ox' then
-            print('InvType is set to "ox" make sure you have added the required snippet from the readme file to ox_inventory/data/stashes.lua as the target option for drinks fridge stash is now disabled and the event controlled by ox_inventory')
+            exports.ox_inventory:openInventory('stash', 'limeysstoragefridge') -- if changing stash name in ox make sure you change it here too
         end
     else
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic'  then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end)
 
+--ingredients tray
 AddEventHandler("lusty94_limeys:client:IngredientsTray", function()
     if onDuty then
         if ShopType == 'qb'then
-            TriggerServerEvent("inventory:server:OpenInventory", "shop", "IngredientsTray", Config.InteractionLocations.Ingredients.Items)
+            TriggerServerEvent("inventory:server:OpenInventory", "shop", "LimeysIngredients", Config.InteractionLocations.Ingredients.Items)
         elseif ShopType == 'jim' then
-            TriggerServerEvent("jim-shops:ShopOpen", "shop", "IngredientsTray", Config.InteractionLocations.Ingredients.Items)
+            TriggerServerEvent("jim-shops:ShopOpen", "shop", "LimeysIngredients", Config.InteractionLocations.Ingredients.Items)
         elseif ShopType == 'ox' then
-            print('ShopType is set to "ox" make sure you have added the required snippet from the readme file to ox_inventory/data/shops.lua as the target option for ingredients tray is now disabled and the event controlled by ox_inventory')
+            exports.ox_inventory:openInventory('shop', { type = 'LimeysIngredients' }) -- if changing shop name in ox make sure you change it here too
         end
     else
-        if Config.CoreSettings.Notify.Type == 'qb' then
-            QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-        elseif Config.CoreSettings.Notify.Type == 'okok' then
-            exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound) 
-        elseif Config.CoreSettings.Notify.Type == 'mythic'  then
-            exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-        elseif Config.CoreSettings.Notify.Type == 'boii' then
-            exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-        end
+        SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
     end
 end)
 
+--snack shelf {doesnt go to society}
 AddEventHandler("lusty94_limeys:client:SnackShelf", function()
     if ShopType == 'qb' then
-        TriggerServerEvent("inventory:server:OpenInventory", "shop", "SnackShelf", Config.InteractionLocations.SnackShelf.Items)
+        TriggerServerEvent("inventory:server:OpenInventory", "shop", "LimeysSnacks", Config.InteractionLocations.SnackShelf.Items)
     elseif ShopType == 'jim' then
-        TriggerServerEvent("jim-shops:ShopOpen", "shop", "SnackShelf", Config.InteractionLocations.SnackShelf.Items)
+        TriggerServerEvent("jim-shops:ShopOpen", "shop", "LimeysSnacks", Config.InteractionLocations.SnackShelf.Items)
     elseif ShopType == 'ox' then
-        print('ShopType is set to "ox" make sure you have added the required snippet from the readme file to ox_inventory/data/shops.lua as the target option for the snack shelf is now disabled and the event controlled by ox_inventory')
+        exports.ox_inventory:openInventory('shop', { type = 'LimeysSnacks' }) -- if changing shop name in ox make sure you change it here too
     end
 end)
------------------------------------------------------< STASHES SECTION END >---------------------------------------------------
+
+-- smoothie cup input
+RegisterNetEvent('lusty94_limeys:client:GiveSmoothieCup', function(data) 
+    local dialog = exports['qb-input']:ShowInput({
+        header = "How Many Do You Want?",
+        submitText = "Confirm",
+        inputs = {
+            {
+                text = "Amount", -- text you want to be displayed as a place holder
+                name = "amount", -- name of the input should be unique otherwise it might override
+                type = "number", -- type of the input - number will not allow non-number characters in the field so only accepts 0-9
+                isRequired = true, -- Optional [accepted values: true | false] but will submit the form if no value is inputted
+            }
+        },
+    })
+    if dialog then
+        TriggerServerEvent('lusty94_limeys:server:GiveSmoothieCup', tonumber(dialog["amount"]))
+    end
+end)
+
+--coffee cup input
+RegisterNetEvent('lusty94_limeys:client:GiveCoffeeCup', function(data) 
+    local dialog = exports['qb-input']:ShowInput({
+        header = "How Many Do You Want?",
+        submitText = "Confirm",
+        inputs = {
+            {
+                text = "Amount", -- text you want to be displayed as a place holder
+                name = "amount", -- name of the input should be unique otherwise it might override
+                type = "number", -- type of the input - number will not allow non-number characters in the field so only accepts 0-9
+                isRequired = true, -- Optional [accepted values: true | false] but will submit the form if no value is inputted
+            }
+        },
+    })
+    if dialog then
+        TriggerServerEvent('lusty94_limeys:server:GiveCoffeeCup', tonumber(dialog["amount"]))
+    end
+end)
 
 
 
-
-
-
-
------------------------------------------------------< BILLING SECTION START >---------------------------------------------------
+--billing
 RegisterNetEvent("lusty94_limeys:client:bill")
 AddEventHandler("lusty94_limeys:bill", function()
         if onDuty then
@@ -961,45 +680,109 @@ AddEventHandler("lusty94_limeys:bill", function()
                 TriggerServerEvent("lusty94_limeys:server:bill:player", bill.citizenid, bill.billprice)
             end
         else
-            if Config.CoreSettings.Notify.Type == 'qb' then
-                QBCore.Functions.Notify("You Must Be Clocked In To Work to Do This!", "error", Config.CoreSettings.Notify.Length.Error)
-            elseif Config.CoreSettings.Notify.Type == 'okok' then
-                exports['okokNotify']:Alert('Not Signed In','You Must Be Clocked In To Work to Do This!', Config.CoreSettings.Notify.Length.Error, 'error', Config.CoreSettings.Notify.Sound)
-            elseif Config.CoreSettings.Notify.Type == 'mythic'  then
-                exports['mythic_notify']:DoHudText('error', 'You Must Be Clocked In To Work To Do This!')
-            elseif Config.CoreSettings.Notify.Type == 'boii' then
-                exports['boii_ui']:notify('Not Signed In', 'You Must Be Clocked In To Work to Do This!', 'error', Config.CoreSettings.Notify.Length.Error)
-            end
+            SendNotify("You Must Be Clocked In To Do That!", 'error', 2500)
         end
 end)
------------------------------------------------------< BILLING SECTION END >---------------------------------------------------
 
 
-
-
-AddEventHandler('onResourceStop', function(resourceName) if resourceName ~= GetCurrentResourceName() then return end
-if (GetCurrentResourceName() ~= resourceName) then
-end
-    print('^5--<^3!^5>-- ^7Lusty94 ^5| ^5--<^3!^5>-- ^Limeys V1.1.0 Stopped Successfully ^5--<^3!^5>--^7')
-    if TargetType == 'qb' then
-        exports['qb-target']:RemoveZone("DutyZone")
-        exports['qb-target']:RemoveZone("BossMenuZone")
-        exports['qb-target']:RemoveZone("PaymentZone")
-        exports['qb-target']:RemoveZone("CollectionTrayZone")
-        exports['qb-target']:RemoveZone("SmoothieMachineZone")
-        exports['qb-target']:RemoveZone("HotDrinksMachineZone")
-        exports['qb-target']:RemoveZone("StorageFridgeZone")
-        exports['qb-target']:RemoveZone("IngredientsTrayZone")
-        exports['qb-target']:RemoveZone("SnackShelfZone")
-    elseif TargetType == 'ox' then
-        exports.ox_target:removeZone(1)
-        exports.ox_target:removeZone(2)
-        exports.ox_target:removeZone(3)
-        exports.ox_target:removeZone(4)
-        exports.ox_target:removeZone(5)
-        exports.ox_target:removeZone(6)
-        exports.ox_target:removeZone(7)
-        exports.ox_target:removeZone(8)
-        exports.ox_target:removeZone(9)
+-- function to lock inventory to prevent exploits
+function LockInventory(toggle) -- big up to jim for how to do this
+	if toggle then
+        if InvType == 'qb' then
+            TriggerEvent('inventory:client:busy:status', true) TriggerEvent('canUseInventoryAndHotbar:toggle', false)
+        elseif InvType == 'ox' then
+            LocalPlayer.state:set("inv_busy", true, true)
+        end
+    else 
+        if InvType == 'qb' then
+         TriggerEvent('inventory:client:busy:status', false) TriggerEvent('canUseInventoryAndHotbar:toggle', true)
+        elseif InvType == 'ox' then
+            LocalPlayer.state:set("inv_busy", false, true)
+        end
     end
+end
+
+
+--job stuff dont touch 
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
+AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+   QBCore.Functions.GetPlayerData(function(PlayerData)
+       PlayerJob = PlayerData.job
+   end)
 end)
+--job stuff dont touch 
+RegisterNetEvent('QBCore:Client:OnJobUpdate')
+AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo)
+   PlayerJob = JobInfo
+   onDuty = PlayerJob.onduty
+end)
+--job stuff dont touch 
+RegisterNetEvent('QBCore:Client:SetDuty')
+AddEventHandler('QBCore:Client:SetDuty', function(duty)
+   onDuty = duty
+end)
+--job stuff dont touch 
+RegisterNetEvent("lusty94_limeys:client:ToggleDuty")
+AddEventHandler("lusty94_limeys:client:ToggleDuty", function()
+   TriggerServerEvent("QBCore:ToggleDuty")
+end)
+
+
+--dont touch
+AddEventHandler('onResourceStop', function(resource)
+	if resource == GetCurrentResourceName() then
+        if TargetType == 'qb' then
+            exports['qb-target']:RemoveZone("DutyZone")
+            exports['qb-target']:RemoveZone("BossMenuZone")
+            exports['qb-target']:RemoveZone("PaymentZone")
+            exports['qb-target']:RemoveZone("CollectionTrayZone")
+            exports['qb-target']:RemoveZone("SmoothieMachineZone")
+            exports['qb-target']:RemoveZone("HotDrinksMachineZone")
+            exports['qb-target']:RemoveZone("StorageFridgeZone")
+            exports['qb-target']:RemoveZone("IngredientsTrayZone")
+            exports['qb-target']:RemoveZone("SnackShelfZone")
+        elseif TargetType == 'ox' then
+            exports.ox_target:removeZone(1)
+            exports.ox_target:removeZone(2)
+            exports.ox_target:removeZone(3)
+            exports.ox_target:removeZone(4)
+            exports.ox_target:removeZone(5)
+            exports.ox_target:removeZone(6)
+            exports.ox_target:removeZone(7)
+            exports.ox_target:removeZone(8)
+            exports.ox_target:removeZone(9)
+        end
+        print('^5--<^3!^5>-- ^7| Lusty94 |^5 ^5--<^3!^5>--^7 Limeys V1.2.0 Stopped Successfully ^5--<^3!^5>--^7')
+	end
+end)
+
+
+--if just wanting area cleared on resource start use this snippet
+
+--[[ 
+
+AddEventHandler('onResourceStart', function(resourceName)
+    if (GetCurrentResourceName() ~= resourceName) then
+        --THIS CLEARS THE MLO OF PEDS FROM THE CENTRE OF THE MLO AT A RADIUS OF 20.0 AS SOMETIMES PED SPAWN INSIDE THE BUILDING AND KEEP TRYING TO GO THROUGH WALLS
+        --IF CHANGING LOCATIONS FOR MLO THEN MAKE SURE YOU REMOVE THIS IF NEEDS BE AS IT MIGHT INTERFERE WITH OTHER SCRIPTS / MLOS IN THE AREA
+        ClearAreaOfPeds(257.95, -1022.84, 29.31, 20.0, true)
+    end
+end) 
+
+]]
+
+  
+
+--if wanting area cleared every second then use this snippet
+
+--THIS CLEARS THE MLO OF PEDS FROM THE CENTRE OF THE MLO AT A RADIUS OF 20.0 AS SOMETIMES PED SPAWN INSIDE THE BUILDING AND KEEP TRYING TO GO THROUGH WALLS
+-- OLD METHOD USE IF YOU WANT TO INSTEAD OF ON RESOURCE START ABOVE - THIS WILL RUN AND CLEAR PEDS FROM THE AREA EVERY SECOND, INCREASE AS YOU SEE FIT
+CreateThread(function()
+    while true do
+        ClearAreaOfPeds(257.95, -1022.84, 29.31, 20.0, true)
+        Wait(1000)
+    end
+end) 
+
+
+  

@@ -1,8 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
 
-
-
 RegisterServerEvent("lusty94_limeys:server:bill:player")
 AddEventHandler("lusty94_limeys:server:bill:player", function(playerId, amount)
         local biller = QBCore.Functions.GetPlayer(source)
@@ -23,7 +21,8 @@ AddEventHandler("lusty94_limeys:server:bill:player", function(playerId, amount)
                         TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source) -- change this to suit your phone event if you want a phone notification
                         TriggerClientEvent('QBCore:Notify', source, 'Invoice Successfully Sent', 'success')
                         Player.Functions.AddMoney('bank', amount) -- change this to bank or cash if you want [can also change this to go into society fund using the qb-management export just uncomment the line below and comment this line out for adding money to the player]
-                        --exports['qb-management']:AddMoney(Config.CoreSettings.Job.Name, amount) [society account must already exist in database for this to work properly]
+                        --exports['qb-management']:AddMoney(Config.CoreSettings.Job.Name, amount) [if still using old qb-management that handles money]
+                        --exports['qb-banking']:AddMoney(Config.CoreSettings.Job.Name, amount) [if using new qb-management where qb-banking now handles money]
                         TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'New Invoice Received')
                     else
                         TriggerClientEvent('QBCore:Notify', source, 'Must Be A Valid Amount Above 0', 'error')
@@ -35,7 +34,7 @@ AddEventHandler("lusty94_limeys:server:bill:player", function(playerId, amount)
                 TriggerClientEvent('QBCore:Notify', source, 'Player Not Online', 'error')
             end
         else
-            TriggerClientEvent('QBCore:Notify', source, 'No Access', 'error')
+            TriggerClientEvent('QBCore:Notify', source, 'No Access', 'error')     
         end
 end)
 

@@ -8,7 +8,7 @@ author 'Lusty94'
 
 description 'Limeys Juice Bar Job Script For QB-Core'
 
-version '1.1.0'
+version '1.2.0'
 
 
 client_scripts {
@@ -28,10 +28,7 @@ shared_scripts {
 }
 
 escrow_ignore {
-    'shared/config.lua',
-    'shared/menus.lua',
-    'shared/targets.lua',
-    'shared/billing.lua',
-    'client/limeys_client.lua',
-    'server/limeys_server.lua',
+    'shared/**.lua',
+    'client/**.lua',
+    'server/**.lua',
 }
