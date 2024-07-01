@@ -541,6 +541,93 @@ end)
 
 
 
+
+
+-------------------------< REGISTERING OX STUFF ON START >-----------------
+
+--attachments shop
+function limeysIngredients()
+    exports.ox_inventory:RegisterShop('LimeysIngredients', {
+        name = 'Limeys Ingredients',
+        inventory = {
+            { name = 'icecubes', price = 0 },
+            { name = 'fruitjuice', price = 0 },
+            { name = 'mango', price = 0 },
+            { name = 'peach', price = 0 },
+            { name = 'lychee', price = 0 },
+            { name = 'pineapple', price = 0 },
+            { name = 'coconut', price = 0 },
+            { name = 'strawberry', price = 0 },
+            { name = 'passionfruit', price = 0 },
+            { name = 'lemon', price = 0 },
+            { name = 'almonds', price = 0 },
+        },
+        groups = {
+            limeys = 0
+        },
+    })    
+end
+
+--tints shop
+function limeysSnacks()
+    exports.ox_inventory:RegisterShop('LimeysSnacks', {
+        name = 'Limeys Snack Shelf',
+        inventory = {
+            { name = 'chocolatedoughnut', price = 0 },
+            { name = 'jamdoughnut', price = 0 },
+            { name = 'custarddoughnut', price = 0 },
+            { name = 'yumyum', price = 0 },
+            { name = 'icedbun', price = 0 },
+        },
+        groups = {
+            limeys = 0
+        },
+    })
+end
+
+--collection tray
+function limeysCollectionTray()
+    local collectionTray = {
+        id = 'limeyscollectiontray',
+        label = 'Limeys Collection Tray',
+        slots = 5,
+        weight = 10000000,
+        owner = false,
+    }
+    exports.ox_inventory:RegisterStash(collectionTray.id, collectionTray.label, collectionTray.slots, collectionTray.weight, collectionTray.owner, collectionTray.jobs)
+end
+--weapon storage
+function limeysStorageFridge()
+    local storage = {
+        id = 'limeysstoragefridge',
+        label = 'Limeys Storage Fridge',
+        slots = 64,
+        weight = 10000000,
+        owner = true,
+        jobs = {["limeys"] = 0},
+    }
+    exports.ox_inventory:RegisterStash(storage.id, storage.label, storage.slots, storage.weight, storage.owner, storage.jobs)
+end
+
+
+-- dont touch this is for ox stashes and shops
+AddEventHandler('onResourceStart', function(resourceName)
+    if (GetCurrentResourceName() == resourceName) then
+        if InvType == 'ox' then
+            print('^5--<^3!^5>-- ^7| Lusty94_Limeys |^5 ^5--<^3!^5>--^7')
+            print('^5--<^3!^5>-- ^7| Inventory Type is set to ox |^5 ^5--<^3!^5>--^7')
+            print('^5--<^3!^5>-- ^7| Registering shops and stashes automatically |^5 ^5--<^3!^5>--^7')
+            limeysIngredients()
+            limeysSnacks()
+            limeysCollectionTray()
+            limeysStorageFridge()
+            print('^5--<^3!^5>-- ^7| Shops and stashes registered successfully |^5 ^5--<^3!^5>--^7')
+        end
+    end
+end)
+
+
+
 local function CheckVersion()
 	PerformHttpRequest('https://raw.githubusercontent.com/Lusty94/UpdatedVersions/main/Limeys/version.txt', function(err, newestVersion, headers)
 		local currentVersion = GetResourceMetadata(GetCurrentResourceName(), 'version')

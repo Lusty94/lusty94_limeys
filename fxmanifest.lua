@@ -8,7 +8,7 @@ author 'Lusty94'
 
 description 'Limeys Juice Bar Job Script For QB-Core'
 
-version '1.2.0'
+version '2.0.0'
 
 
 client_scripts {

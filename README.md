@@ -1,165 +1,125 @@
-# Lusty94_Limeys
+## Lusty94_Limeys
 
 
-# SCRIPT SUPPORT VIA DISCORD: https://discord.gg/BJGFrThmA8
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+PLEASE MAKE SURE TO READ THIS ENTIRE FILE AS IT COVERS SOME IMPORTANT INFORMATION
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 
+======================================
+SCRIPT SUPPORT VIA DISCORD: https://discord.gg/BJGFrThmA8
+======================================
 
 
 
+## Features
 
-
------Dependencies------
-
-qb-core: https://github.com/qbcore-framework/qb-core
-
-qb-target: https://github.com/qbcore-framework/qb-target
-
-qb-menu: https://github.com/qbcore-framework/qb-menu
-
-qb-input: https://github.com/qbcore-framework/qb-input
-
-qb-inventroy: https://github.com/qbcore-framework/qb-inventory
-
-progressbar: https://github.com/qbcore-framework/progressbar
-
-ox_lib: https://github.com/overextended/ox_lib/releases
-
-Limeys MLO: https://www.gta5-mods.com/maps/mlo-limeys-juice-bar-fivem-add-on-sp   
-MAKE SURE TO INSTALL THE FIVEM VERSION NOT THE SINGLEPLAYER VERSION!
+- Make various types of smoothies
+- Make various types of hot drinks
+- Billing system to charge customers
+- Managemenu menu to hire and fire employees
 
 
 
 
+## DEPENDENCIES
+
+- [Limeys MLO](https://www.gta5-mods.com/maps/mlo-limeys-juice-bar-fivem-add-on-sp ) [CAN BE MOVED TO ANOTHER MLO BY MOVING TARGET LOCATIONS IN CONFIG]
+- [qb-core](https://github.com/qbcore-framework/qb-core)
+- [qb-target](https://github.com/qbcore-framework/qb-target)
+- [qb-menu](https://github.com/qbcore-framework/qb-menu)
+- [qb-inventory](https://github.com/qbcore-framework/qb-inventory)
+- [ox_lib](https://github.com/overextended/ox_lib/releases/)
 
 
 
-# INSTALLATION
 
-# MAKE SURE TO INSTALL ALL NECCESSARY DEPENDENCIES AND ENSURE THEY START BEFORE LUSTY94_LIMEYS IN YOUR SERVER.CFG FILE
 
+
+## INSTALLATION
+
+- Add the ##ITEMS snippet below into your core/shared/items.lua file
+- Add the ##JOB snippet below to your core/shared/jobs.lua
+- Add all .png images inside [images] folder into your inventory/html/images folder - ox_inventory users place images inside inventory/web/images
+- Add the snippet for consumables to qb-smallresources or another consumable script
+
+
+## OX_INVENTORY
+
+- This resource creates and registers shops and stashes for ox_inventory automatically
+- if using ox_invnetory item names for shops etc are located in limeys_server.lua - edit prices or names there
+
+
+
+
+
+## JOB
+```
+
+   	limeys = {
+        label = 'Limeys Juice Bar',
+        defaultDuty = false,
+        offDutyPay = false,
+        grades = {
+            ['0'] = { name = 'Employee', payment = 50 },
+            ['1'] = { name = 'Juice Maker', payment = 50 },
+            ['2'] = { name = 'Floor Manager', payment = 50 },
+            ['3'] = { name = 'GENERAL MANAGER', payment = 50 },
+            ['4'] = {  name = 'OWNER', isboss = true, payment = 50 },
+        },
+    },
+
+```
+
+## CONSUMABLES
+
+- Insert into qb-smallresources config.lua or your own consumables script to eat and drink items created
+- Edit amounts of hunger/thirst replenished to suit your server
+
+
+```
+
+	Under Config.ConsumbalesEat Place The Following
+
+	["chocolatedoughnut"] = math.random(35, 54),
+    ["jamdoughnut"] = math.random(35, 54),
+    ["custarddoughnut"] = math.random(35, 54),
+    ["yumyum"] = math.random(35, 54),
+    ["icedbun"] = math.random(35, 54),
 	
-# Insert images inside [images] folder into inventory/html/images - ox_inventory is web/images
-
-
-## OX INVENTORY USERS - STORAGE FRIDGE, INGREDIENTS FRIDGE, SNACK SHELF & COLLECTION TRAY INFORMATION
-
-# If you are using ox_inventory you must add this snippet below to ox_inventory/data/shops & stashes.lua for the ingredients and snack shelf stores to work correctly. 
-
-```
-	--shops .lua
-
-    LimeysIngredients = {
-		name = 'Limeys Fridge',
-		groups = {
-			['limeys'] = 0
-		},
-		inventory = {
-			{ name = 'icecubes', price = 0 },
-			{ name = 'fruitjuice', price = 0 },
-			{ name = 'mango', price = 0 },
-			{ name = 'peach', price = 0 },
-			{ name = 'lychee', price = 0 },
-			{ name = 'pineapple', price = 0 },
-			{ name = 'coconut', price = 0 },
-			{ name = 'strawberry', price = 0 },
-			{ name = 'passionfruit', price = 0 },
-			{ name = 'lemon', price = 0 },
-			{ name = 'almonds', price = 0 },
-		},
-	},
-
-	LimeysSnacks = {
-		name = 'Limeys Snack Shelf',
-		inventory = {
-			{ name = 'chocolatedoughnut', price = 10 },
-			{ name = 'jamdoughnut', price = 10 },
-			{ name = 'custarddoughnut', price = 10 },
-			{ name = 'yumyum', price = 10 },
-			{ name = 'icedbun', price = 10 },
-		},
-	},
-
-```
-
-```
-	--stashes.lua
-
-    { -- limeys collection tray
-		name = 'limeyscollectiontray',
-		label = 'Limeys Collection Tray',
-		owner = false,
-		slots = 10,
-		weight = 100000000,
-	},
-
-	{ -- limeys storage fridge
-		name = 'limeysstoragefridge',
-		label = 'Limeys Storage Fridge',
-		owner = false,
-		slots = 41,
-		weight = 1000000000,
-		groups = {['limeys'] = 0}
-	},
-
-```
-
-
-Insert items into qb-core/shared/items.lua
-
-Adjust weights of items to suit your server
-
-
-# old qb-core method
-```
-
-
-	['mango'] 					= {['name'] = 'mango', 			 	  	  		['label'] = 'Fresh Mango', 				    ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'mango.png', 					['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Mango'},
-	['peach'] 					= {['name'] = 'peach', 			 	  	  		['label'] = 'Fresh Peach', 				    ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'peach.png', 					['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Peach'},
-	['lychee'] 					= {['name'] = 'lychee', 			 	  	  	['label'] = 'Fresh Lychee', 				['weight'] = 200, 		['type'] = 'item', 					['image'] = 'lychee.png', 					['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Lychee'},
-	['pineapple'] 				= {['name'] = 'pineapple', 			 	  	  	['label'] = 'Fresh Pineapple', 				['weight'] = 200, 		['type'] = 'item', 					['image'] = 'pineapple.png', 				['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Pineapple'},
-	['coconut'] 				= {['name'] = 'coconut', 			 	  	  	['label'] = 'Fresh Coconut', 				['weight'] = 200, 		['type'] = 'item', 					['image'] = 'coconut.png', 					['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Coconut'},
-	['strawberry'] 				= {['name'] = 'strawberry', 			 	  	['label'] = 'Fresh Strawberry', 			['weight'] = 200, 		['type'] = 'item', 					['image'] = 'strawberry.png', 				['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Strawberry'},
-	['passionfruit'] 			= {['name'] = 'passionfruit', 			 	  	['label'] = 'Fresh Passion Fruit', 			['weight'] = 200, 		['type'] = 'item', 					['image'] = 'passionfruit.png', 			['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Passion Fruit'},
-	['lemon'] 					= {['name'] = 'lemon', 			 	  	  		['label'] = 'Fresh Lemon', 				    ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'lemon.png', 					['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Lemon'},
-	['almonds'] 				= {['name'] = 'almonds', 			 	  	  	['label'] = 'Fresh Almonds', 				['weight'] = 200, 		['type'] = 'item', 					['image'] = 'almonds.png', 					['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Almonds'},
 	
-    
-    ['tea'] 					= {['name'] = 'tea', 			 	  	  	    ['label'] = 'Cup of Tea', 				    ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'cupoftea.png', 				['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Cup of Tea'},
-    ['coffee'] 					= {['name'] = 'coffee', 			 	  	  	['label'] = 'Cup of Coffee', 				['weight'] = 200, 		['type'] = 'item', 					['image'] = 'cupofcoffee.png', 				['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Cup of Coffee'},
-    ['hotchocolate'] 			= {['name'] = 'hotchocolate', 			 	  	['label'] = 'Cup of Hot Chocolate', 		['weight'] = 200, 		['type'] = 'item', 					['image'] = 'cupofhotchocolate.png', 		['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Cup of Hot Chocolate'},
-    
-    ['smoothiecup'] 			= {['name'] = 'smoothiecup', 			 	  	['label'] = 'Smoothie Cup', 		        ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'smoothiecup.png', 			    ['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Smoothie Cup'},
-    ['coffeecup'] 			    = {['name'] = 'coffeecup', 			 	  	    ['label'] = 'Coffee Cup', 		            ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'coffeecup.png', 			    ['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Coffee Cup'},
-    ['icecubes'] 			    = {['name'] = 'icecubes', 			 	  	    ['label'] = 'Ice Cubes', 		            ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'icecubes.png', 			    ['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Frozen Ice Cubes'},
-    ['fruitjuice'] 			    = {['name'] = 'fruitjuice', 			 	  	['label'] = 'Fruit Juice', 		            ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'fruitjuice.png', 			    ['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Fruit Juice'},
-    
-    
-    ['chocolatedoughnut'] 		= {['name'] = 'chocolatedoughnut', 			 	['label'] = 'Chocolate Doughnut', 		    ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'chocolatedougnut.png', 		['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Chocolate Dougnut'},
-    ['jamdoughnut'] 			= {['name'] = 'jamdoughnut', 			 	  	['label'] = 'Jam Doughnut', 		        ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'jamdougnut.png', 			    ['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Jam Dougnut'},
-    ['custarddoughnut'] 		= {['name'] = 'custarddoughnut', 			 	['label'] = 'Custard Doughnut', 		    ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'custarddougnut.png', 			['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Custard Dougnut'},
-    ['yumyum'] 			        = {['name'] = 'yumyum', 			 	  	    ['label'] = 'Iced Yum-Yum', 		        ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'yumyum.png', 			        ['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Iced Yum-Yum'},
-    ['icedbun'] 			    = {['name'] = 'icedbun', 			 	  	    ['label'] = 'Iced Bun', 		            ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'icedbun.png', 			        ['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Iced Bun'},
-    
-    ['mangosmoothie'] 			= {['name'] = 'mangosmoothie', 			 	  	['label'] = 'Mango Smoothie', 		        ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'mangosmoothie.png', 			['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Mango Smoothie'},
-    ['peachsmoothie'] 			= {['name'] = 'peachsmoothie', 			 	  	['label'] = 'Peach Smoothie', 		        ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'peachsmoothie.png', 			['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Peach Smoothie'},
-    ['lycheesmoothie'] 			= {['name'] = 'lycheesmoothie', 			 	['label'] = 'Lychee Smoothie', 		        ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'lycheesmoothie.png', 			['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Lychee Smoothie'},
-    ['pineapplesmoothie'] 		= {['name'] = 'pineapplesmoothie', 			 	['label'] = 'Pineapple Smoothie', 		    ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'pineapplesmoothie.png', 		['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Pineapple Smoothie'},
-    ['coconutsmoothie'] 		= {['name'] = 'coconutsmoothie', 			 	['label'] = 'Coconut Smoothie', 		    ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'coconutsmoothie.png', 			['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Coconut Smoothie'},
-    ['strawberrysmoothie'] 		= {['name'] = 'strawberrysmoothie', 			['label'] = 'Strawberry Smoothie', 		    ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'strawberrysmoothie.png', 		['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Strawberry Smoothie'},
-    ['passionfruitsmoothie'] 	= {['name'] = 'passionfruitsmoothie', 			['label'] = 'Passion Fruit Smoothie', 		['weight'] = 200, 		['type'] = 'item', 					['image'] = 'passionfruitsmoothie.png', 	['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Passion Fruit Smoothie'},
-    ['lemonsmoothie'] 			= {['name'] = 'lemonsmoothie', 			 	  	['label'] = 'Lemon Smoothie', 		        ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'lemonsmoothie.png', 			['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Lemon Smoothie'},
-    ['almondsmoothie'] 			= {['name'] = 'almondsmoothie', 			 	['label'] = 'Almond Smoothie', 		        ['weight'] = 200, 		['type'] = 'item', 					['image'] = 'almondsmoothie.png', 			['unique'] = false, 	['useable'] = true, 	['shouldClose'] = true,   ['combinable'] = nil,   ['description'] = 'Fresh Almond Smoothie'},
+
+	Under Config.ConsumablesDrink Place The Following
+
+	["mangosmoothie"] = math.random(40, 50),
+    ["peachsmoothie"] = math.random(40, 50),
+    ["lycheesmoothie"] = math.random(40, 50),
+    ["pineapplesmoothie"] = math.random(40, 50),
+    ["coconutsmoothie"] = math.random(40, 50),
+    ["strawberrysmoothie"] = math.random(40, 50),
+    ["passionfruitsmoothie"] = math.random(40, 50),
+    ["lemonsmoothie"] = math.random(40, 50),
+    ["almondsmoothie"] = math.random(40, 50),
+    ["tea"] = math.random(40, 50),
+    ["coffee"] = math.random(40, 50),
+    ["hotchocolate"] = math.random(40, 50),
 
 
 ```
 
-# new qb-core method
+
+
+## ITEMS
 
 ```
 
-mango 					= {name = 'mango', 			 	  	  		label = 'Fresh Mango', 				    weight = 200, 		type = 'item', 					image = 'mango.png', 					unique = false, 	useable = true, 	shouldClose = true,   combinable = nil,   description = 'Fresh Mango'},
+
+    --LIMEYS JUICE BAR
+
+    mango 					= {name = 'mango', 			 	  	  		label = 'Fresh Mango', 				    weight = 200, 		type = 'item', 					image = 'mango.png', 					unique = false, 	useable = true, 	shouldClose = true,   combinable = nil,   description = 'Fresh Mango'},
 	peach 					= {name = 'peach', 			 	  	  		label = 'Fresh Peach', 				    weight = 200, 		type = 'item', 					image = 'peach.png', 					unique = false, 	useable = true, 	shouldClose = true,   combinable = nil,   description = 'Fresh Peach'},
 	lychee 					= {name = 'lychee', 			 	  	  	label = 'Fresh Lychee', 				weight = 200, 		type = 'item', 					image = 'lychee.png', 					unique = false, 	useable = true, 	shouldClose = true,   combinable = nil,   description = 'Fresh Lychee'},
 	pineapple 				= {name = 'pineapple', 			 	  	  	label = 'Fresh Pineapple', 				weight = 200, 		type = 'item', 					image = 'pineapple.png', 				unique = false, 	useable = true, 	shouldClose = true,   combinable = nil,   description = 'Fresh Pineapple'},
@@ -195,112 +155,17 @@ mango 					= {name = 'mango', 			 	  	  		label = 'Fresh Mango', 				    weight 
     passionfruitsmoothie 	= {name = 'passionfruitsmoothie', 			label = 'Passion Fruit Smoothie', 		weight = 200, 		type = 'item', 					image = 'passionfruitsmoothie.png', 	unique = false, 	useable = true, 	shouldClose = true,   combinable = nil,   description = 'Fresh Passion Fruit Smoothie'},
     lemonsmoothie 			= {name = 'lemonsmoothie', 			 	  	label = 'Lemon Smoothie', 		        weight = 200, 		type = 'item', 					image = 'lemonsmoothie.png', 			unique = false, 	useable = true, 	shouldClose = true,   combinable = nil,   description = 'Fresh Lemon Smoothie'},
     almondsmoothie 			= {name = 'almondsmoothie', 			 	label = 'Almond Smoothie', 		        weight = 200, 		type = 'item', 					image = 'almondsmoothie.png', 			unique = false, 	useable = true, 	shouldClose = true,   combinable = nil,   description = 'Fresh Almond Smoothie'},
-
-```
-
---Insert job into core/shared/jobs.lua
---Adjust payment and titles to suit your server
-
-# old qb-core method
-
-```
-['limeys'] = {
-		label = 'Limeys Juice Bar',
-		defaultDuty = false,
-		offDutyPay = false,
-		grades = {
-            ['0'] = {
-                name = 'Employee',
-                payment = 50
-            },
-            ['1'] = {
-                name = 'Juice Maker',
-                payment = 50
-            },
-            ['2'] = {
-                name = 'Floor Manager',
-                payment = 50
-            },
-            ['3'] = {
-                name = 'GENERAL MANAGER',
-                payment = 50
-            },
-            ['4'] = {
-                name = 'OWNER',
-                isboss = true,
-                payment = 50
-            },
-        },
-	},
-
-```
-
-# new qb-core method
-
-```
-limeys = {
-    label = 'Limeys Juice Bar',
-    defaultDuty = false,
-    offDutyPay = false,
-    grades = {
-        ['0'] = {
-            name = 'Employee',
-            payment = 50
-        },
-        ['1'] = {
-            name = 'Juice Maker',
-            payment = 50
-        },
-        ['2'] = {
-            name = 'Floor Manager',
-            payment = 50
-        },
-        ['3'] = {
-            name = 'GENERAL MANAGER',
-            payment = 50
-        },
-        ['4'] = {
-            name = 'OWNER',
-            isboss = true,
-            payment = 50
-        },
-    },
-},
-
-
-```
-
---Insert into qb-smallresources config.lua or your own consumables script to eat and drink items created
---Edit amounts of hunger/thirst replenished to suit your server
-
-```
-
-	Under Config.ConsumbalesEat Place The Following
-
-	["chocolatedoughnut"] = math.random(35, 54),
-    ["jamdoughnut"] = math.random(35, 54),
-    ["custarddoughnut"] = math.random(35, 54),
-    ["yumyum"] = math.random(35, 54),
-    ["icedbun"] = math.random(35, 54),
-	
 	
 
-	Under Config.ConsumablesDrink Place The Following
-
-	["mangosmoothie"] = math.random(40, 50),
-    ["peachsmoothie"] = math.random(40, 50),
-    ["lycheesmoothie"] = math.random(40, 50),
-    ["pineapplesmoothie"] = math.random(40, 50),
-    ["coconutsmoothie"] = math.random(40, 50),
-    ["strawberrysmoothie"] = math.random(40, 50),
-    ["passionfruitsmoothie"] = math.random(40, 50),
-    ["lemonsmoothie"] = math.random(40, 50),
-    ["almondsmoothie"] = math.random(40, 50),
-    ["tea"] = math.random(40, 50),
-    ["coffee"] = math.random(40, 50),
-    ["hotchocolate"] = math.random(40, 50),
 
 ```
+
+
+
+
+
+
+
 
 	
 	
