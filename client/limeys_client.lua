@@ -1,10 +1,10 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local ShopType = Config.CoreSettings.Shop.Type
 local InvType = Config.CoreSettings.Inventory.Type
 local TargetType = Config.CoreSettings.Target.Type
 local NotifyType = Config.CoreSettings.Notify.Type
 local onDuty, busy = false, false
 PlayerJob = {}
+
 if Config.DevMode then
     onDuty = true
 end
@@ -36,7 +36,7 @@ end
 CreateThread(function()
     for k, v in pairs(Config.Blips) do
         if v.useblip then
-            v.blip = AddBlipForCoord(v['coords'].x, v['coords'].y, v['coords'].z)
+            v.blip = AddBlipForCoord(v.coords.x, v.coords.y, v.coords.z)
             SetBlipSprite(v.blip, v.id)
             SetBlipDisplay(v.blip, 4)
             SetBlipScale(v.blip, v.scale)
@@ -50,10 +50,16 @@ CreateThread(function()
 end)
 
 
+--THIS CLEARS THE MLO OF PEDS FROM THE CENTRE OF THE MLO AT A RADIUS OF 20.0 AS SOMETIMES PED SPAWN INSIDE THE BUILDING AND KEEP TRYING TO GO THROUGH WALLS
+CreateThread(function()
+    while true do
+        Wait(1000)
+        ClearAreaOfPeds(257.95, -1022.84, 29.31, 20.0, true) -- if changing MLO locations then might need to change this or remove it completely
+    end
+end) 
 
 
-
-
+------------------------------< SMOOTHIES >------------------------
 
 
 --Prepare Mango Smoothie
@@ -62,38 +68,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareMangoSmoothie", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:MangoSmoothie', function(HasItems)  
         if HasItems then
                 if busy then
-                    SendNotify("You Are Already Doing Something!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                 else
                     local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                     if success then
                         busy = true
                         LockInventory(true)
-                        FreezeEntityPosition(PlayerPedId(), true) 
-                        if lib.progressCircle({ duration = 10000, label = 'Preparing smoothie...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                        if lib.progressCircle({ 
+                            duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                            label = Config.Language.ProgressBar.PrepareSmoothie, 
+                            position = 'bottom', 
+                            useWhileDead = false, 
+                            canCancel = true, 
+                            disable = { car = true, move = true, }, 
+                            anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                        }) then
+                            TriggerServerEvent('lusty94_limeys:server:CreateMangoSmoothie')
                             busy = false
                             LockInventory(false)
-                            ClearPedTasks(PlayerPedId())
-                            DeleteEntity(chickenPed)
-                            TriggerServerEvent('lusty94_limeys:server:CreateMangoSmoothie')
-                            SendNotify("Smoothie prepared.", 'success', 2000)
-                            FreezeEntityPosition(PlayerPedId(), false)
                         else 
                             busy = false
                             LockInventory(false)
-                            ClearPedTasks(PlayerPedId())
-                            SendNotify('Action cancelled.', 'error', 2000)
-                            FreezeEntityPosition(PlayerPedId(), false)
+                            SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                         end
                     else
-                        SendNotify("Action failed.", 'error', 2000)
+                        SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                     end
                 end
             else
-                SendNotify("You are missing items!", 'error', 2500)
+                SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
             end
         end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end) 
 
@@ -103,38 +110,39 @@ RegisterNetEvent("lusty94_limeys:client:PreparePeachSmoothie", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:PeachSmoothie', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing smoothie...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareSmoothie, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, }, 
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreatePeachSmoothie')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreatePeachSmoothie')
-                                SendNotify("Smoothie prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end) 
 
@@ -144,38 +152,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareLycheeSmoothie", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:LycheeSmoothie', function(HasItems)  
             if HasItems then
                 if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing smoothie...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareSmoothie, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, }, 
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreateLycheeSmoothie')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreateLycheeSmoothie')
-                                SendNotify("Smoothie prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end) 
 
@@ -185,38 +194,39 @@ RegisterNetEvent("lusty94_limeys:client:PreparePineappleSmoothie", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:PineappleSmoothie', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing smoothie...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareSmoothie, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, },
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreatePineappleSmoothie')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreatePineappleSmoothie')
-                                SendNotify("Smoothie prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end)
 
@@ -226,38 +236,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareCoconutSmoothie", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:CoconutSmoothie', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing smoothie...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareSmoothie, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, }, 
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreateCoconutSmoothie')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreateCoconutSmoothie')
-                                SendNotify("Smoothie prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end) 
 
@@ -267,38 +278,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareStrawberrySmoothie", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:StrawberrySmoothie', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing smoothie...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareSmoothie, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, },
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreateStrawberrySmoothie')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreateStrawberrySmoothie')
-                                SendNotify("Smoothie prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end)
 
@@ -308,38 +320,39 @@ RegisterNetEvent("lusty94_limeys:client:PreparePassionFruitSmoothie", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:PassionFruitSmoothie', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing smoothie...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareSmoothie, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, },
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreatePassionFruitSmoothie')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreatePassionFruitSmoothie')
-                                SendNotify("Smoothie prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end) 
 
@@ -349,38 +362,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareLemonSmoothie", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:LemonSmoothie', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing smoothie...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareSmoothie, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, },
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreateLemonSmoothie')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreateLemonSmoothie')
-                                SendNotify("Smoothie prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end)  
 
@@ -390,41 +404,45 @@ RegisterNetEvent("lusty94_limeys:client:PrepareAlmondSmoothie", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:AlmondSmoothie', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing smoothie...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareSmoothie, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, },
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreateAlmondSmoothie')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreateAlmondSmoothie')
-                                SendNotify("Smoothie prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end) 
 
+
+
+------------------------------< HOT DRINKS >------------------------
 
 --Prepare Tea
 RegisterNetEvent("lusty94_limeys:client:PrepareTea", function()
@@ -432,38 +450,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareTea", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:CoffeeCup', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing hot drink...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareHotDrink, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, },
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreateTea')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreateTea')
-                                SendNotify("Hot drink prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end) 
 
@@ -473,38 +492,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareCoffee", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:CoffeeCup', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing hot drink...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareHotDrink, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, },
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreateCoffee')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreateCoffee')
-                                SendNotify("Hot drink prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end) 
 
@@ -514,38 +534,39 @@ RegisterNetEvent("lusty94_limeys:client:PrepareHotChocolate", function()
         QBCore.Functions.TriggerCallback('lusty94_limeys:get:CoffeeCup', function(HasItems)  
             if HasItems then
                     if busy then
-                        SendNotify("You Are Already Doing Something!", 'error', 2500)
+                        SendNotify(Config.Language.Notifications.Busy, 'error', 2500)
                     else
                         local success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', 'easy'}, {'e'})
                         if success then
                             busy = true
                             LockInventory(true)
-                            FreezeEntityPosition(PlayerPedId(), true) 
-                            if lib.progressCircle({ duration = 10000, label = 'Preparing hot drink...', position = 'bottom', useWhileDead = false, canCancel = true, disable = { car = true, }, anim = { dict = Config.Animations.PrepareIngredients.dict, clip = Config.Animations.PrepareIngredients.anim, flag = Config.Animations.PrepareIngredients.flag, },}) then
+                            if lib.progressCircle({ 
+                                duration = Config.CoreSettings.Timers.PrepareDrinks, 
+                                label = Config.Language.ProgressBar.PrepareHotDrink, 
+                                position = 'bottom', 
+                                useWhileDead = false, 
+                                canCancel = true, 
+                                disable = { car = true, move = true, },
+                                anim = { dict = Config.Animations.PrepareIngredients.AnimDict, clip = Config.Animations.PrepareIngredients.Anim, flag = Config.Animations.PrepareIngredients.Flags, },
+                            }) then
+                                TriggerServerEvent('lusty94_limeys:server:CreateHotChocolate')
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                DeleteEntity(chickenPed)
-                                TriggerServerEvent('lusty94_limeys:server:CreatehotChocolate')
-                                SendNotify("Hot drink prepared.", 'success', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
                             else 
                                 busy = false
                                 LockInventory(false)
-                                ClearPedTasks(PlayerPedId())
-                                SendNotify('Action cancelled.', 'error', 2000)
-                                FreezeEntityPosition(PlayerPedId(), false)
+                                SendNotify(Config.Language.Notifications.Cancelled, 'error', 2000)
                             end
                         else
-                            SendNotify("Action failed.", 'error', 2000)
+                            SendNotify(Config.Language.Notifications.Failed, 'error', 2000)
                         end
                     end
                 else
-                    SendNotify("You are missing items!", 'error', 2500)
+                    SendNotify(Config.Language.Notifications.MissingItems, 'error', 2500)
                 end
             end)
     else 
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end) 
 
@@ -553,112 +574,61 @@ end)
 
 
 
-
+------------------------------< STASHES AND SHOPS >------------------------
 
 --collection tray
 RegisterNetEvent("lusty94_limeys:client:OpenCollectionTray", function()
     if InvType == 'qb' then
-        local stashInfo = {
-            maxweight = 100000,
-            slots = 5,
-        }
-        TriggerEvent("inventory:client:SetCurrentStash", "collectiontray")
-        TriggerServerEvent("inventory:server:OpenInventory", "stash", "collectiontray", {
-            maxweight = stashInfo.maxweight,
-            slots = stashInfo.slots,
-        })
+        TriggerServerEvent('lusty94_limeys:server:CollectionTray')
     elseif InvType == 'ox' then
         exports.ox_inventory:openInventory('stash', 'limeyscollectiontray') -- if changing stash name in ox make sure you change it here too
     end
 end)
 
 
-
-
 --storage fridge
 RegisterNetEvent("lusty94_limeys:client:OpenStorageFridge", function()
     if onDuty then
         if InvType == 'qb' then
-            local stashInfo = {
-                maxweight = 10000000,
-                slots = 64,
-            }
-            TriggerEvent("inventory:client:SetCurrentStash", "limeysdrinksfridge")
-            TriggerServerEvent("inventory:server:OpenInventory", "stash", "limeysdrinksfridge", {
-                maxweight = stashInfo.maxweight,
-            slots = stashInfo.slots,
-            })
+            TriggerServerEvent('lusty94_limeys:server:StorageFridge')
         elseif InvType == 'ox' then
             exports.ox_inventory:openInventory('stash', 'limeysstoragefridge')
         end
     else
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end)
-
-
-
-
-
 
 
 --ingredients tray
 AddEventHandler("lusty94_limeys:client:IngredientsTray", function()
     if onDuty then
-        local limeysIngredients = { -- this is only relevant if using qb-inventory - ox users change item names and prices in server file
-            label = "Ingredients Tray", 
-            slots = 11,
-            items = {
-                [1] = {name = "icecubes", price = 0, amount = 100000, info = {}, type = "item", slot = 1,},
-                [2] = {name = "fruitjuice", price = 0, amount = 100000, info = {}, type = "item", slot = 2,},
-                [3] = {name = "mango", price = 0, amount = 100000, info = {}, type = "item", slot = 3,},
-                [4] = {name = "peach", price = 0, amount = 100000, info = {}, type = "item", slot = 4,},
-                [5] = {name = "lychee", price = 0, amount = 100000, info = {}, type = "item", slot = 5,},
-                [6] = {name = "pineapple", price = 0, amount = 100000, info = {}, type = "item", slot = 6,},
-                [7] = {name = "coconut", price = 0, amount = 100000, info = {}, type = "item", slot = 7,},
-                [8] = {name = "strawberry", price = 0, amount = 100000, info = {}, type = "item", slot = 8,},
-                [9] = {name = "passionfruit", price = 0, amount = 100000, info = {}, type = "item", slot = 9,},
-                [10] = {name = "lemon", price = 0, amount = 100000, info = {}, type = "item", slot = 10,},
-                [11] = {name = "almonds", price = 0, amount = 100000, info = {}, type = "item", slot = 11,},
-            },
-        }
-        if ShopType == 'qb'then
-            TriggerServerEvent("inventory:server:OpenInventory", "shop", "LimeysIngredients", limeysIngredients)
-        elseif ShopType == 'jim' then
-            TriggerServerEvent("jim-shops:ShopOpen", "shop", "LimeysIngredients", limeysIngredients)
-        elseif ShopType == 'ox' then
+        if InvType == 'qb'then
+            TriggerServerEvent('lusty94_limeys:server:IngredientsTray')
+        elseif InvType == 'ox' then
             exports.ox_inventory:openInventory('shop', { type = 'LimeysIngredients' })
         end
     else
-        SendNotify("You must be on duty to proceed!", 'error', 2500)
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end)
 
---snack shelf {doesnt go to society}
+
+--snack shelf
 AddEventHandler("lusty94_limeys:client:SnackShelf", function()
-    local limeysSnacksShelf = { -- this is only relevant if using qb-inventory - ox users change item names and prices in server file
-        label = "Snack Shelf", 
-        slots = 5,
-        items = {
-            [1] = {name = "chocolatedoughnut", price = 10, amount = 100000, info = {}, type = "item", slot = 1,},
-            [2] = {name = "jamdoughnut", price = 10, amount = 100000, info = {}, type = "item", slot = 2,},
-            [3] = {name = "custarddoughnut", price = 10, amount = 100000, info = {}, type = "item", slot = 3,},
-            [4] = {name = "yumyum", price = 10, amount = 100000, info = {}, type = "item", slot = 4,},
-            [5] = {name = "icedbun", price = 10, amount = 100000, info = {}, type = "item", slot = 5,},
-        },
-    }
-    if ShopType == 'qb' then
-        TriggerServerEvent("inventory:server:OpenInventory", "shop", "LimeysSnacks", limeysSnacksShelf)
-    elseif ShopType == 'jim' then
-        TriggerServerEvent("jim-shops:ShopOpen", "shop", "LimeysSnacks", limeysSnacksShelf)
-    elseif ShopType == 'ox' then
-        exports.ox_inventory:openInventory('shop', { type = 'LimeysSnacks' })
+    if onDuty then
+        if InvType == 'qb' then
+            TriggerServerEvent('lusty94_limeys:server:SnackShelf')
+        elseif InvType == 'ox' then
+            exports.ox_inventory:openInventory('shop', { type = 'LimeysSnacks' })
+        end
+    else
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
     end
 end)
 
 
-
-
+------------------------------< CUP INPUTS >------------------------
 
 -- smoothie cup input
 RegisterNetEvent('lusty94_limeys:client:GiveSmoothieCup', function(data) 
@@ -682,78 +652,132 @@ end)
 
 
 
+------------------------------< BILLING >------------------------
+
 --billing
 RegisterNetEvent("lusty94_limeys:client:bill")
 AddEventHandler("lusty94_limeys:bill", function()
+    if onDuty then
         if onDuty then
-            local bill = exports['qb-input']:ShowInput({
-                header = "Create Invoice",
-                submitText = "Send Invoice",
-                inputs = {
-                    {
-                        text = "Server ID(#)",
-                        name = "citizenid", -- name of the input should be unique otherwise it might override
-                        type = "text", -- type of the input
-                        isRequired = true -- Optional [accepted values: true | false] but will submit the form if no value is inputted
-                    },
-                    {
-                        text = "Total Bill Price:", -- text you want to be displayed as a place holder
-                        name = "billprice", -- name of the input should be unique otherwise it might override
-                        type = "number", -- type of the input - number will not allow non-number characters in the field so only accepts 0-9
-                        isRequired = true -- Optional [accepted values: true | false] but will submit the form if no value is inputted
-                    }
-                    
-                }
+            local bill = lib.inputDialog('Limeys Payment Till', {
+                {type = 'input',  label = 'Citizen ID', description = 'Players Citizen ID',     icon = 'hashtag'},
+                {type = 'number', label = 'Bill Price', description = 'The Bills Total Price',  icon = 'dollar-sign'}
             })
             if bill ~= nil then
-                if bill.citizenid == nil or bill.billprice == nil then 
-                    return 
+                if bill[1] == nil or bill[2] == nil then
+                    return
                 end
-                TriggerServerEvent("lusty94_limeys:server:bill:player", bill.citizenid, bill.billprice)
+                TriggerServerEvent('lusty94_limeys:server:bill:player', bill[1], bill[2])
             end
         else
-            SendNotify("You must be on duty to proceed!", 'error', 2500)
+            SendNotify(Config.Language.Notifications.Duty, 'error', 2000)
         end
+    else
+        SendNotify(Config.Language.Notifications.Duty, 'error', 2500)
+    end
 end)
 
+
+
+------------------------------< CONSUMABLES >------------------------
+
+--eat food items
+RegisterNetEvent('lusty94_limeys:client:eatFood', function(itemName)
+    if busy then
+        SendNotify(Config.Language.Notifications.Busy, 'error', 2000)
+    else
+        busy = true
+        LockInventory(true)
+        if lib.progressCircle({ 
+            duration = Config.CoreSettings.Timers.Eat, 
+            label = Config.Language.ProgressBar.Eat, 
+            position = 'bottom', 
+            useWhileDead = false, 
+            canCancel = true, 
+            disable = { car = false, move = false, }, 
+            anim = { dict = Config.Animations.Eat.AnimDict, clip = Config.Animations.Eat.Anim, flag = Config.Animations.Eat.Flag,}, 
+            prop = { model = Config.Animations.Eat.Prop, bone = Config.Animations.Eat.Bone, pos = Config.Animations.Eat.Pos, rot = Config.Animations.Eat.Rot,},
+        }) then
+            TriggerServerEvent("lusty94_limeys:server:eatFood", itemName)
+            TriggerServerEvent("consumables:server:addHunger", QBCore.Functions.GetPlayerData().metadata["hunger"] + Config.Consumables.Food[itemName])
+            busy = false
+            LockInventory(false)
+        else 
+            busy = false
+            LockInventory(false)
+            SendNotify(Config.Language.Notifications.CancelledName, 'error', 2000)
+        end
+    end
+end)
+
+--drink
+RegisterNetEvent('lusty94_limeys:client:Drink', function(itemName)
+    if busy then
+        SendNotify(Config.Language.Notifications.Busy, 'error', 2000)
+    else
+        busy = true
+        LockInventory(true)
+        if lib.progressCircle({ 
+            duration = Config.CoreSettings.Timers.Drink, 
+            label = Config.Language.ProgressBar.Drink, 
+            position = 'bottom', 
+            useWhileDead = false, 
+            canCancel = true, 
+            disable = { car = false, move = false, }, 
+            anim = { dict = Config.Animations.Drink.AnimDict, clip = Config.Animations.Drink.Anim, flag = Config.Animations.Drink.Flag,}, 
+            prop = { model = Config.Animations.Drink.Prop, bone = Config.Animations.Drink.Bone, pos = Config.Animations.Drink.Pos, rot = Config.Animations.Drink.Rot,},
+        }) then
+            TriggerServerEvent("lusty94_limeys:server:Drink", itemName)
+            TriggerServerEvent("consumables:server:addThirst", QBCore.Functions.GetPlayerData().metadata["thirst"] + Config.Consumables.Drink[itemName])
+            busy = false
+            LockInventory(false)
+        else 
+            busy = false
+            LockInventory(false)
+            SendNotify(Config.Language.Notifications.CancelledName, 'error', 2000)
+        end
+    end
+end)
+
+
+
+------------------------------< DONT TOUCH >------------------------
 
 -- function to lock inventory to prevent exploits
 function LockInventory(toggle) -- big up to jim for how to do this
 	if toggle then
         LocalPlayer.state:set("inv_busy", true, true) -- used by qb, ps and ox
-
         --this is the old method below
-
-        --[[ 
-        
+        --[[        
         if InvType == 'qb' then
             this is for the old method if using old qb and ox
             TriggerEvent('inventory:client:busy:status', true) TriggerEvent('canUseInventoryAndHotbar:toggle', false)
         elseif InvType == 'ox' then
             LocalPlayer.state:set("inv_busy", true, true)
-        end 
-        
+        end        
         ]]
-
-    else 
+    else
         LocalPlayer.state:set("inv_busy", false, true) -- used by qb, ps and ox
-
         --this is the old method below
-
-        --[[
-        
+        --[[        
         if InvType == 'qb' then
             this is for the old method if using old qb and ox
          TriggerEvent('inventory:client:busy:status', false) TriggerEvent('canUseInventoryAndHotbar:toggle', true)
         elseif InvType == 'ox' then
             LocalPlayer.state:set("inv_busy", false, true)
-        end
-        
+        end        
         ]]
-
     end
 end
 
+--function to display item images
+function ItemImage(img)
+	if InvType == 'ox' then
+		return 'nui://ox_inventory/web/images/'.. img.. '.png'
+	elseif InvType == 'qb' then
+		return 'nui://qb-inventory/html/images/'.. QBCore.Shared.Items[img].image
+	end
+end
 
 --job stuff dont touch 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
@@ -784,21 +808,6 @@ end)
 AddEventHandler('onResourceStop', function(resource)
 	if resource == GetCurrentResourceName() then
         for k, v in pairs(Config.InteractionLocations.JobAreas) do if TargetType == 'qb' then exports['qb-target']:RemoveZone(v.Name) elseif TargetType == 'ox' then exports.ox_target:removeZone(v.Name) end end
-        print('^5--<^3!^5>-- ^7| Lusty94 |^5 ^5--<^3!^5>--^7 Limeys V2.0.0 Stopped Successfully ^5--<^3!^5>--^7')
+        print('^5--<^3!^5>-- ^7| Lusty94 |^5 ^5--<^3!^5>--^7 Limeys V2.0.1 Stopped Successfully ^5--<^3!^5>--^7')
 	end
 end)
-
-
-
-
---THIS CLEARS THE MLO OF PEDS FROM THE CENTRE OF THE MLO AT A RADIUS OF 20.0 AS SOMETIMES PED SPAWN INSIDE THE BUILDING AND KEEP TRYING TO GO THROUGH WALLS
--- OLD METHOD USE IF YOU WANT TO INSTEAD OF ON RESOURCE START ABOVE - THIS WILL RUN AND CLEAR PEDS FROM THE AREA EVERY SECOND, INCREASE AS YOU SEE FIT
-CreateThread(function()
-    while true do
-        Wait(1000)
-        ClearAreaOfPeds(257.95, -1022.84, 29.31, 20.0, true) -- if changing MLO locations then might need to change this or remove it completely
-    end
-end) 
-
-
-  

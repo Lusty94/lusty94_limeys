@@ -1,272 +1,95 @@
-local QBCore = exports['qb-core']:GetCoreObject()
-local MenuType = Config.CoreSettings.Menu.Type
 
-
-
-local SmoothieMenu = {
-    {
-        header = "Prepare Fresh Fruit Smoothies!",
-        isMenuHeader = true,
-    },  
-    {   
-        header = "Get A Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:GiveSmoothieCup",
-        }
-    },          
-    {   
-        header = "Prepare Mango Smoothie",
-        txt = "<u>Ingredients Required:</u> <br> Fresh Mango, Fruit Juice, Ice Cubes, Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:PrepareMangoSmoothie",
-        }
-    },          
-    {   
-        header = "Prepare Peach Smoothie",
-        txt = "<u>Ingredients Required:</u> <br> Fresh Peach, Fruit Juice, Ice Cubes, Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:PreparePeachSmoothie",
-        }
-    },          
-    {   
-        header = "Prepare Lychee Smoothie",
-        txt = "<u>Ingredients Required:</u> <br> Fresh Lychee, Fruit Juice, Ice Cubes, Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:PrepareLycheeSmoothie",
-        }
-    },          
-    {   
-        header = "Prepare Pineapple Smoothie",
-        txt = "<u>Ingredients Required:</u> <br> Fresh Pineapple, Fruit Juice, Ice Cubes, Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:PreparePineappleSmoothie",
-        }
-    },          
-    {   
-        header = "Prepare Coconut Smoothie",
-        txt = "<u>Ingredients Required:</u> <br> Fresh Coconut, Fruit Juice, Ice Cubes, Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:PrepareCoconutSmoothie",
-        }
-    },          
-    {   
-        header = "Prepare Strawberry Smoothie",
-        txt = "<u>Ingredients Required:</u> <br> Fresh Strawberry, Fruit Juice, Ice Cubes, Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:PrepareStrawberrySmoothie",
-        }
-    },          
-    {   
-        header = "Prepare Passion Fruit Smoothie",
-        txt = "<u>Ingredients Required:</u> <br> Fresh Passion Fruit, Fruit Juice, Ice Cubes, Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:PreparePassionFruitSmoothie",
-        }
-    },
-    {   
-        header = "Prepare Lemon Smoothie",
-        txt = "<u>Ingredients Required:</u> <br> Fresh Lemon, Fruit Juice, Ice Cubes, Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:PrepareLemonSmoothie",
-        }
-    },          
-    {   
-        header = "Prepare Almond Smoothie",
-        txt = "<u>Ingredients Required:</u> <br> Fresh Almond, Fruit Juice, Ice Cubes, Smoothie Cup",
-        params = {
-            event = "lusty94_limeys:client:PrepareAlmondSmoothie",
-        }
-    },       
-    {
-        header = "< Close",
-        txt = "",
-        params = {
-            event = "qb-menu:closeMenu",
-        }
-    },
-}
-
-
+--smothies menu
 lib.registerContext({
-    id = 'SmoothieMenu',
+    id = 'SmoothiesMenu',
     title = 'Prepare Fresh Fruit Smoothies!',
     options = {
       {
         title = 'Get Smoothie Cup',
-        icon = 'glass-water',
         event = 'lusty94_limeys:client:GiveSmoothieCup',
         arrow = true,
+        icon = ItemImage('smoothiecup'),
+        image = ItemImage('smoothiecup'),
       },
       {
         title = 'Prepare Mango Smoothie',
-        icon = 'blender',
         event = 'lusty94_limeys:client:PrepareMangoSmoothie',
         arrow = true,
-        metadata = {
-            {label = 'Mango Required', value = 1},
-            {label = 'Fruit Juice Required', value = 1},
-            {label = 'Ice Cubes Required', value = 1},
-            {label = 'Smoothie Cup Required', value = 1},
-          },
+        description = 'Ingredients Required: \n Mango \n Fruit Juice \n Ice Cubes \n Smoothie Cup',
+        icon = ItemImage('mangosmoothie'),
+        image = ItemImage('mangosmoothie'),
       },
       {
         title = 'Prepare Peach Smoothie',
-        icon = 'blender',
         event = 'lusty94_limeys:client:PreparePeachSmoothie',
         arrow = true,
-        metadata = {
-            {label = 'Peach Required', value = 1},
-            {label = 'Fruit Juice Required', value = 1},
-            {label = 'Ice Cubes Required', value = 1},
-            {label = 'Smoothie Cup Required', value = 1},
-          },
+        description = 'Ingredients Required: \n Peach \n Fruit Juice \n Ice Cubes \n Smoothie Cup',
+        icon = ItemImage('peachsmoothie'),
+        image = ItemImage('peachsmoothie'),
       },
       {
         title = 'Prepare Lychee Smoothie',
-        icon = 'blender',
         event = 'lusty94_limeys:client:PrepareLycheeSmoothie',
         arrow = true,
-        metadata = {
-            {label = 'Lychee Required', value = 1},
-            {label = 'Fruit Juice Required', value = 1},
-            {label = 'Ice Cubes Required', value = 1},
-            {label = 'Smoothie Cup Required', value = 1},
-          },
+        description = 'Ingredients Required: \n Lychee \n Fruit Juice \n Ice Cubes \n Smoothie Cup',
+        icon = ItemImage('lycheesmoothie'),
+        image = ItemImage('lycheesmoothie'),
       },
       {
         title = 'Prepare Pineapple Smoothie',
-        icon = 'blender',
         event = 'lusty94_limeys:client:PreparePineappleSmoothie',
         arrow = true,
-        metadata = {
-            {label = 'Pineapple Required', value = 1},
-            {label = 'Fruit Juice Required', value = 1},
-            {label = 'Ice Cubes Required', value = 1},
-            {label = 'Smoothie Cup Required', value = 1},
-          },
+        description = 'Ingredients Required: \n Pineapple \n Fruit Juice \n Ice Cubes \n Smoothie Cup',
+        icon = ItemImage('pineapplesmoothie'),
+        image = ItemImage('pineapplesmoothie'),
       },
       {
         title = 'Prepare Coconut Smoothie',
-        icon = 'blender',
         event = 'lusty94_limeys:client:PrepareCoconutSmoothie',
         arrow = true,
-        metadata = {
-            {label = 'Coconut Required', value = 1},
-            {label = 'Fruit Juice Required', value = 1},
-            {label = 'Ice Cubes Required', value = 1},
-            {label = 'Smoothie Cup Required', value = 1},
-          },
+        description = 'Ingredients Required: \n Coconut \n Fruit Juice \n Ice Cubes \n Smoothie Cup',
+        icon = ItemImage('coconutsmoothie'),
+        image = ItemImage('coconutsmoothie'),
       },
       {
         title = 'Prepare Strawberry Smoothie',
-        icon = 'blender',
         event = 'lusty94_limeys:client:PrepareStrawberrySmoothie',
         arrow = true,
-        metadata = {
-            {label = 'Strawberry Required', value = 1},
-            {label = 'Fruit Juice Required', value = 1},
-            {label = 'Ice Cubes Required', value = 1},
-            {label = 'Smoothie Cup Required', value = 1},
-          },
+        description = 'Ingredients Required: \n Strawberry \n Fruit Juice \n Ice Cubes \n Smoothie Cup',
+        icon = ItemImage('strawberrysmoothie'),
+        image = ItemImage('strawberrysmoothie'),
       },
       {
         title = 'Prepare Passion Fruit Smoothie',
-        icon = 'blender',
         event = 'lusty94_limeys:client:PreparePassionFruitSmoothie',
         arrow = true,
-        metadata = {
-            {label = 'Passion Fruit Required', value = 1},
-            {label = 'Fruit Juice Required', value = 1},
-            {label = 'Ice Cubes Required', value = 1},
-            {label = 'Smoothie Cup Required', value = 1},
-          },
+        description = 'Ingredients Required: \n Passion Fruit \n Fruit Juice \n Ice Cubes \n Smoothie Cup',
+        icon = ItemImage('passionfruitsmoothie'),
+        image = ItemImage('passionfruitsmoothie'),
       },
       {
         title = 'Prepare Lemon Smoothie',
-        icon = 'blender',
         event = 'lusty94_limeys:client:PrepareLemonSmoothie',
         arrow = true,
-        metadata = {
-            {label = 'Lemon Required', value = 1},
-            {label = 'Fruit Juice Required', value = 1},
-            {label = 'Ice Cubes Required', value = 1},
-            {label = 'Smoothie Cup Required', value = 1},
-          },
+        description = 'Ingredients Required: \n Lemon \n Fruit Juice \n Ice Cubes \n Smoothie Cup',
+        icon = ItemImage('lemonsmoothie'),
+        image = ItemImage('lemonsmoothie'),
       },
       {
         title = 'Prepare Almond Smoothie',
-        icon = 'blender',
         event = 'lusty94_limeys:client:PrepareAlmondSmoothie',
         arrow = true,
-        metadata = {
-            {label = 'Almond Required', value = 1},
-            {label = 'Fruit Juice Required', value = 1},
-            {label = 'Ice Cubes Required', value = 1},
-            {label = 'Smoothie Cup Required', value = 1},
-          },
-      },
-      
-      
+        description = 'Ingredients Required: \n Almond \n Fruit Juice \n Ice Cubes \n Smoothie Cup',
+        icon = ItemImage('almondsmoothie'),
+        image = ItemImage('almondsmoothie'),
+      },      
     }
 })
 
 
-RegisterNetEvent('lusty94_limeys:client:SmoothieMenu', function()
-    if MenuType == 'qb' then
-        exports['qb-menu']:openMenu(SmoothieMenu)
-    elseif MenuType == 'jixel' then
-        exports['jixel-menu']:openMenu(SmoothieMenu)
-    elseif MenuType == 'ox' then
-        lib.showContext('SmoothieMenu')
-    elseif MenuType == 'custom' then
-        --insert custom menu code here
-    end
-end)
--------------------------------------------------------< SMOOTHIE MENU END >---------------------------------------------------
 
 
 
--------------------------------------------------------< HOT DRINKS MENU START >---------------------------------------------------
-local HotDrinksMenu = {
-    {
-        header = "Prepare Fresh Fruit Smoothies!",
-        isMenuHeader = true,
-    },  
-    {   
-        header = "Get A Coffee Cup",
-        params = {
-            event = "lusty94_limeys:client:GiveCoffeeCup",
-        }
-    },          
-    {   
-        header = "Prepare Cup of Tea",
-        txt = "Coffee Cup Required",
-        params = {
-            event = "lusty94_limeys:client:PrepareTea",
-        }
-    },       
-    {   
-        header = "Prepare Cup of Coffee",
-        txt = "Coffee Cup Required",
-        params = {
-            event = "lusty94_limeys:client:PrepareCoffee",
-        }
-    },       
-    {   
-        header = "Prepare Cup of Hot Chocolate",
-        txt = "Coffee Cup Required",
-        params = {
-            event = "lusty94_limeys:client:PrepareHotChocolate",
-        }
-    },       
-    {
-        header = "< Close",
-        txt = "",
-        params = {
-            event = "qb-menu:closeMenu",
-        }
-    },
-}
 
 lib.registerContext({
     id = 'HotDrinksMenu',
@@ -277,43 +100,47 @@ lib.registerContext({
         icon = 'mug-saucer',
         event = 'lusty94_limeys:client:GiveCoffeeCup',
         arrow = true,
+        icon = ItemImage('coffeecup'),
+        image = ItemImage('coffeecup'),
       },
       {
         title = 'Prepare Cup of Tea',
-        icon = 'mug-hot',
         event = 'lusty94_limeys:client:PrepareTea',
         description = 'Coffee Cup Required',
         arrow = true,
+        description = 'Coffe Cup Required',
+        icon = ItemImage('tea'),
+        image = ItemImage('tea'),
       },
       {
         title = 'Prepare Cup of Coffee',
-        icon = 'mug-hot',
         event = 'lusty94_limeys:client:PrepareCoffee',
         description = 'Coffee Cup Required',
         arrow = true,
+        description = 'Coffe Cup Required',
+        icon = ItemImage('coffee'),
+        image = ItemImage('coffee'),
       },
       {
         title = 'Prepare Cup of Hot Chocolate',
-        icon = 'mug-hot',
         event = 'lusty94_limeys:client:PrepareHotChocolate',
         description = 'Coffee Cup Required',
         arrow = true,
+        description = 'Coffe Cup Required',
+        icon = ItemImage('hotchocolate'),
+        image = ItemImage('hotchocolate'),
       },
     }
 })
 
 
-RegisterNetEvent('lusty94_limeys:client:HotDrinksMenu', function()
-    if MenuType == 'qb' then
-        exports['qb-menu']:openMenu(HotDrinksMenu)
-    elseif MenuType == 'jixel' then
-        exports['jixel-menu']:openMenu(HotDrinksMenu)
-    elseif MenuType == 'ox' then
-        lib.showContext('HotDrinksMenu')
-    elseif MenuType == 'custom' then
-        --insert custom menu code here
-    end
+
+
+
+RegisterNetEvent('lusty94_limeys:client:SmoothieMenu', function()
+    lib.showContext('SmoothiesMenu')
 end)
--------------------------------------------------------< HOT DRINKS MENU END >---------------------------------------------------
 
-
+RegisterNetEvent('lusty94_limeys:client:HotDrinksMenu', function()
+    lib.showContext('HotDrinksMenu')
+end)

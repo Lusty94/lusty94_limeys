@@ -27,10 +27,9 @@ SCRIPT SUPPORT VIA DISCORD: https://discord.gg/BJGFrThmA8
 
 ## DEPENDENCIES
 
-- [Limeys MLO](https://www.gta5-mods.com/maps/mlo-limeys-juice-bar-fivem-add-on-sp ) [CAN BE MOVED TO ANOTHER MLO BY MOVING TARGET LOCATIONS IN CONFIG]
+- [Limeys MLO](https://www.gta5-mods.com/maps/mlo-limeys-juice-bar-fivem-add-on-sp)
 - [qb-core](https://github.com/qbcore-framework/qb-core)
 - [qb-target](https://github.com/qbcore-framework/qb-target)
-- [qb-menu](https://github.com/qbcore-framework/qb-menu)
 - [qb-inventory](https://github.com/qbcore-framework/qb-inventory)
 - [ox_lib](https://github.com/overextended/ox_lib/releases/)
 
@@ -48,7 +47,7 @@ SCRIPT SUPPORT VIA DISCORD: https://discord.gg/BJGFrThmA8
 
 
 ## OX_INVENTORY
-
+- Items list for ox_inventory is below
 - This resource creates and registers shops and stashes for ox_inventory automatically
 - if using ox_invnetory item names for shops etc are located in limeys_server.lua - edit prices or names there
 
@@ -74,45 +73,18 @@ SCRIPT SUPPORT VIA DISCORD: https://discord.gg/BJGFrThmA8
 
 ```
 
+
+
 ## CONSUMABLES
 
-- Insert into qb-smallresources config.lua or your own consumables script to eat and drink items created
-- Edit amounts of hunger/thirst replenished to suit your server
-
-
-```
-
-	Under Config.ConsumbalesEat Place The Following
-
-	["chocolatedoughnut"] = math.random(35, 54),
-    ["jamdoughnut"] = math.random(35, 54),
-    ["custarddoughnut"] = math.random(35, 54),
-    ["yumyum"] = math.random(35, 54),
-    ["icedbun"] = math.random(35, 54),
-	
-	
-
-	Under Config.ConsumablesDrink Place The Following
-
-	["mangosmoothie"] = math.random(40, 50),
-    ["peachsmoothie"] = math.random(40, 50),
-    ["lycheesmoothie"] = math.random(40, 50),
-    ["pineapplesmoothie"] = math.random(40, 50),
-    ["coconutsmoothie"] = math.random(40, 50),
-    ["strawberrysmoothie"] = math.random(40, 50),
-    ["passionfruitsmoothie"] = math.random(40, 50),
-    ["lemonsmoothie"] = math.random(40, 50),
-    ["almondsmoothie"] = math.random(40, 50),
-    ["tea"] = math.random(40, 50),
-    ["coffee"] = math.random(40, 50),
-    ["hotchocolate"] = math.random(40, 50),
-
-
-```
+- This resource has an inbuilt consumalbes system
+- To edit replenishment values edit the math.random() figures in Config.Consumables
 
 
 
-## ITEMS
+
+
+## QB-CORE ITEMS
 
 ```
 
@@ -160,6 +132,345 @@ SCRIPT SUPPORT VIA DISCORD: https://discord.gg/BJGFrThmA8
 
 ```
 
+
+## OX_INVENTORY ITEMS
+
+```
+
+
+
+	["peach"] = {
+		label = "Fresh Peach",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Peach",
+		client = {
+			image = "peach.png",
+		}
+	},
+
+	["coffeecup"] = {
+		label = "Coffee Cup",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Coffee Cup",
+		client = {
+			image = "coffeecup.png",
+		}
+	},
+
+	["lemonsmoothie"] = {
+		label = "Lemon Smoothie",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Lemon Smoothie",
+		client = {
+			image = "lemonsmoothie.png",
+		}
+	},
+
+	["passionfruitsmoothie"] = {
+		label = "Passion Fruit Smoothie",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Passion Fruit Smoothie",
+		client = {
+			image = "passionfruitsmoothie.png",
+		}
+	},
+
+	["lychee"] = {
+		label = "Fresh Lychee",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Lychee",
+		client = {
+			image = "lychee.png",
+		}
+	},
+
+	["icedbun"] = {
+		label = "Iced Bun",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Iced Bun",
+		client = {
+			image = "icedbun.png",
+		}
+	},
+
+	["chocolatedoughnut"] = {
+		label = "Chocolate Doughnut",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Chocolate Dougnut",
+		client = {
+			image = "chocolatedougnut.png",
+		}
+	},
+
+	["coffee"] = {
+		label = "Cup of Coffee",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Cup of Coffee",
+		client = {
+			image = "coffee.png",
+		}
+	},
+
+	["pineapple"] = {
+		label = "Fresh Pineapple",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Pineapple",
+		client = {
+			image = "pineapple.png",
+		}
+	},
+
+	["jamdoughnut"] = {
+		label = "Jam Doughnut",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Jam Dougnut",
+		client = {
+			image = "jamdougnut.png",
+		}
+	},
+
+	["yumyum"] = {
+		label = "Iced Yum-Yum",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Iced Yum-Yum",
+		client = {
+			image = "yumyum.png",
+		}
+	},
+
+	["almonds"] = {
+		label = "Fresh Almonds",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Almonds",
+		client = {
+			image = "almonds.png",
+		}
+	},
+
+	["strawberrysmoothie"] = {
+		label = "Strawberry Smoothie",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Strawberry Smoothie",
+		client = {
+			image = "strawberrysmoothie.png",
+		}
+	},
+
+	["passionfruit"] = {
+		label = "Fresh Passion Fruit",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Passion Fruit",
+		client = {
+			image = "passionfruit.png",
+		}
+	},
+
+	["tea"] = {
+		label = "Cup of Tea",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Cup of Tea",
+		client = {
+			image = "tea.png",
+		}
+	},
+
+	["lycheesmoothie"] = {
+		label = "Lychee Smoothie",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Lychee Smoothie",
+		client = {
+			image = "lycheesmoothie.png",
+		}
+	},
+
+	["mangosmoothie"] = {
+		label = "Mango Smoothie",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Mango Smoothie",
+		client = {
+			image = "mangosmoothie.png",
+		}
+	},
+
+	["icecubes"] = {
+		label = "Ice Cubes",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Frozen Ice Cubes",
+		client = {
+			image = "icecubes.png",
+		}
+	},
+
+	["smoothiecup"] = {
+		label = "Smoothie Cup",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Smoothie Cup",
+		client = {
+			image = "smoothiecup.png",
+		}
+	},
+
+	["mango"] = {
+		label = "Fresh Mango",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Mango",
+		client = {
+			image = "mango.png",
+		}
+	},
+
+	["custarddoughnut"] = {
+		label = "Custard Doughnut",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Custard Dougnut",
+		client = {
+			image = "custarddougnut.png",
+		}
+	},
+
+	["coconut"] = {
+		label = "Fresh Coconut",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Coconut",
+		client = {
+			image = "coconut.png",
+		}
+	},
+
+	["fruitjuice"] = {
+		label = "Fruit Juice",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Fruit Juice",
+		client = {
+			image = "fruitjuice.png",
+		}
+	},
+
+	["coconutsmoothie"] = {
+		label = "Coconut Smoothie",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Coconut Smoothie",
+		client = {
+			image = "coconutsmoothie.png",
+		}
+	},
+
+	["hotchocolate"] = {
+		label = "Cup of Hot Chocolate",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Cup of Hot Chocolate",
+		client = {
+			image = "hotchocolate.png",
+		}
+	},
+
+	["peachsmoothie"] = {
+		label = "Peach Smoothie",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Peach Smoothie",
+		client = {
+			image = "peachsmoothie.png",
+		}
+	},
+
+	["almondsmoothie"] = {
+		label = "Almond Smoothie",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Almond Smoothie",
+		client = {
+			image = "almondsmoothie.png",
+		}
+	},
+
+	["pineapplesmoothie"] = {
+		label = "Pineapple Smoothie",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Pineapple Smoothie",
+		client = {
+			image = "pineapplesmoothie.png",
+		}
+	},
+
+	["lemon"] = {
+		label = "Fresh Lemon",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Lemon",
+		client = {
+			image = "lemon.png",
+		}
+	},
+
+	["strawberry"] = {
+		label = "Fresh Strawberry",
+		weight = 200,
+		stack = true,
+		close = true,
+		description = "Fresh Strawberry",
+		client = {
+			image = "strawberry.png",
+		}
+	},
+
+
+```
 
 
 
